@@ -1,34 +1,138 @@
-{% extends 'base.html' %}
 {% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nilan Clothing</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
 
-{% block title %}Главная страница{% endblock %}
+</head>
 
-{% block content %}
-<section class="hero">
-    <div class="hero-content">
-        <h1>Добро пожаловать в наш магазин</h1>
-        <p>Лучшие товары по доступным ценам</p>
-        <a href="{% url 'product_list' %}" class="btn-primary">Смотреть товары</a>
-    </div>
-</section>
+<body>
+    <header>
+        <div class="logo">
+            <h1>Nilan Clothing</h1>
+        </div>
+        <nav>
+            <a href="#">Главная</a>
+            <a href="#">Каталог</a>
+            <a href="#">Корзина</a> 
+            <a href="#">Войти</a>
+        </nav>
+    </header>
 
-<section class="features">
-    <div class="container">
-        <h2>Почему выбирают нас?</h2>
-        <div class="features-grid">
-            <div class="feature-card">
-                <h3>🚚 Быстрая доставка</h3>
-                <p>Доставка по всему городу за 24 часа</p>
+    <main>
+        <section class="hero">
+            <h2>Nilan Clothing</h2>
+            <p>Ваш Стиль. Ваши Правила.</p>
+        </section>
+
+        <section class="categories">
+            <h2>Наши товары</h2>
+            <div class="category-grid">
+                <div class="category-card">
+                    <h3>Футболки</h3>
+                </div>
+                <div class="category-card">
+                    <h3>Кофты</h3>
+                </div>
+                <div class="category-card">
+                    <h3>Кепки</h3>
+                </div>
+                <div class="category-card">
+                    <h3>Шорты</h3>
+                </div>
+                <div class="category-card">
+                    <h3>Браслеты</h3>
+                </div>
+                <div class="category-card">
+                    <h3>Кольца</h3>
+                </div>
             </div>
-            <div class="feature-card">
-                <h3>💳 Удобная оплата</h3>
-                <p>Любые способы оплаты</p>
+        </section>
+
+        <section class="products">
+            <h2>Коллекция Nilan</h2>
+            <p>Первые товары появятся здесь скоро</p>
+
+            <div class="products-grid">
+                
+                <!--Футболки-->
+                <div class="product-card">
+                    <img class="product-image" src="{% static 't-shirt.png' %}" alt="Футболка Nilan"> 
+                    <h3>Футболки</h3>
+                    <p>Скоро в продаже</p>
+                    <p class="price">от 1500 руб.</p>
+                    <button>Узнать о запуске</button>
+                </div>
+
+                <!--Кофты-->
+                <div class="product-card">
+                    <img class="product-image" src="{% static 'sweater.png' %}" alt="Кофта Nilan"> 
+                    <h3>Кофты</h3>
+                    <p>Скоро в продаже</p>
+                    <p class="price">от 3500 руб.</p>
+                    <button>Узнать о запуске</button>
+                </div>
+
+                <!--Кепки-->
+                <div class="product-card">
+                    <img class="product-image" src="{% static 'cap.png' %}" alt="Кепка Nilan"> 
+                    <h3>Кепки</h3>
+                    <p>Скоро в продаже</p>
+                    <p class="price">от 1200 руб.</p>
+                    <button>Узнать о запуске</button>
+                </div>
+
+                 <!--Шорты-->
+                <div class="product-card">
+                    <img class="product-image" src="{% static 'shorts.png' %}" alt="Шорты Nilan"> 
+                    <h3>Шорты</h3>
+                    <p>Скоро в продаже</p>
+                    <p class="price">от 2000 руб.</p>
+                    <button>Узнать о запуске</button>
+                </div>
+
+                 <!--Браслеты-->
+                <div class="product-card">
+                    <img class="product-image" src="{% static 'bracelet.png' %}" alt="Браслет Nilan"> 
+                    <h3>Браслеты</h3>
+                    <p>Скоро в продаже</p>
+                    <p class="price">от 500 руб.</p>
+                    <button>Узнать о запуске</button>
+                </div>
+
+                 <!--Кольца-->
+                <div class="product-card">
+                    <img class="product-image" src="{% static 'ring.png' %}" alt="Кольцо Nilan"> 
+                    <h3>Кольца</h3>
+                    <p>Скоро в продаже</p>
+                    <p class="price">от 800 руб.</p>
+                    <button>Узнать о запуске</button>
+                </div>
+
             </div>
-            <div class="feature-card">
-                <h3>⭐ Гарантия качества</h3>
-                <p>Все товары проверены</p>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-content">
+            <!-- Соцсети -->
+            <div class="social-links">
+                <h3>Мы в соцсетях</h3>
+                <div class="social-icons">
+                    <a href="#" class="social-link">Telegram</a>
+                    <a href="#" class="social-link">VK</a>
+                </div>
+            </div>
+            
+            <!-- Копирайт -->
+            <div class="copyright">
+                <p>&copy; 2025 Nilan Clothing. Все права защищены.</p>
+                <p>Сайт создан с ❤️ для фанатов стиля</p>
             </div>
         </div>
-    </div>
-</section>
-{% endblock %}
+    </footer>
+</body>
+</html>
