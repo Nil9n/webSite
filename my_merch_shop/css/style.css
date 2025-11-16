@@ -9,77 +9,78 @@ body {
     font-family: 'Arial', sans-serif;
     line-height: 1.6;
     color: #ffffff;
-    background: url('/static/product_section_bg.png');
+    background: url('/static/body_bg.png');
     background-repeat: no-repeat;
     background-position: center center;
-    background-attachment: fixed; /* Закрепляем фон, чтобы он не скроллился */
-    background-size: cover; /* Растягиваем, чтобы покрыть всю область */
-    
-    /*Накладываем цвет-оверлей*/
-    background-color: #00000098; /* Черный с прозрачностью */
-    
-    /* 3. Используем режим наложения (multiply затемнит изображение с оверлеем) */
+    background-attachment: fixed;
+    background-size: cover;
+    background-color: #00000098;
     background-blend-mode: multiply;
 }
 
-/* Шапка сайта */
+/* Шапка сайта - ПРОСТО И РАБОЧЕ */
 header {
     background: #1a1a1a;
     color: white;
-    padding: 1rem 2rem;
+    padding: 1rem;
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
+    gap: 1rem;
 }
 
 .logo h1 {
-    font-size: 1.8rem;
-    font-weight: bold;
+    font-size: clamp(1.3rem, 4vw, 1.8rem); /* Адаптивный размер */
+}
+
+nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    justify-content: center;
 }
 
 nav a {
     color: white;
     text-decoration: none;
-    margin-left: 1.5rem;
-    transition: color 0.3s;
     padding: 0.5rem 1rem;
     border: 1px solid white;
     border-radius: 5px;
     background-color: transparent;
+    transition: all 0.3s;
+    white-space: nowrap;
 }
 
 nav a:hover {
     color: #1a1a1a;
     background-color: white;
-    border-color: #cccccc;
 }
 
 /* Герой-секция */
 .hero {
-    min-height: 200px; 
-    
-    /* Для лучшей читаемости текста, добавляем темный полупрозрачный слой поверх изображения */
+    background: url('/static/hero_background.png') no-repeat center center/cover;
+    min-height: 200px;
     background-blend-mode: multiply;
-    background-color: rgba(0, 0, 0, 0.4); 
-    
+    background-color: rgba(0, 0, 0, 0.4);
     color: white;
     text-align: center;
     padding: 4rem 1rem;
 }
 
 .hero h2 {
-    font-size: 2.5rem;
+    font-size: clamp(1.5rem, 5vw, 2.5rem);
     margin-bottom: 1rem;
 }
 
 .hero p {
-    font-size: 1.2rem;
+    font-size: clamp(1rem, 3vw, 1.2rem);
     opacity: 0.9;
 }
 
 /* Сетка категорий */
 .categories {
-    padding: 3rem 2rem;
+    padding: 3rem 1rem;
     max-width: 1200px;
     margin: 0 auto;
 }
@@ -87,7 +88,8 @@ nav a:hover {
 .categories h2 {
     text-align: center;
     margin-bottom: 2rem;
-    font-size: 2rem;
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    color: #ffffff;
 }
 
 .category-grid {
@@ -114,17 +116,17 @@ nav a:hover {
 
 /* Сетка товаров */
 .products {
-    padding: 3rem 2rem;
-    background: #f8f9fa;
-    /* Добавляем оверлей, чтобы светлые карточки были контрастны */
-    background-blend-mode: overlay; 
-    background-color: rgba(0, 0, 0, 0.1); /* Легкое затемнение */
+    padding: 3rem 1rem;
+    background: url('/static/product_section_bg.png') no-repeat center center/cover;
+    background-blend-mode: overlay;
+    background-color: rgba(0, 0, 0, 0.1);
 }
 
 .products h2 {
     text-align: center;
     margin-bottom: 1rem;
-    font-size: 2rem;
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    color: #ffffff;
 }
 
 .products > p {
@@ -200,7 +202,7 @@ nav a:hover {
 .site-footer {
     background: #1a1a1a;
     color: white;
-    padding: 3rem 2rem;
+    padding: 3rem 1rem;
     margin-top: 3rem;
 }
 
@@ -208,25 +210,26 @@ nav a:hover {
     max-width: 1200px;
     margin: 0 auto;
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
-    flex-wrap: wrap;
     gap: 2rem;
 }
 
 .social-links h3 {
-    color: #ff6b6b; /* Розовый акцент */
+    color: #ff6b6b;
     margin-bottom: 1rem;
     font-size: 1.2rem;
 }
 
 .social-icons {
     display: flex;
+    flex-wrap: wrap;
     gap: 1rem;
 }
 
 .social-link {
-    color: #4ecdc4; /* Голубой */
+    color: #4ecdc4;
     text-decoration: none;
     padding: 0.5rem 1rem;
     border: 1px solid #4ecdc4;
@@ -237,7 +240,6 @@ nav a:hover {
 .social-link:hover {
     background: #4ecdc4;
     color: #1a1a1a;
-    text-shadow: 0 0 10px #ffffff;
 }
 
 .copyright {
@@ -250,6 +252,6 @@ nav a:hover {
 }
 
 .copyright p:first-child {
-    color: #ff6b6b; /* Розовый для копирайта */
+    color: #ff6b6b;
     font-weight: bold;
 }
