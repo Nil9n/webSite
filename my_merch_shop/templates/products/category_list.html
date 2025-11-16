@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Категории товаров{% endblock %}
+
+{% block content %}
+<div class="categories-header">
+    <h1>Категории товаров</h1>
+</div>
+
+<div class="categories-container">
+    <div class="categories-grid">
+        {% for category in categories %}
+        <div class="category-card">
+            <h3>{{ category.name }}</h3>
+            <p>{{ category.description|default:"Описание категории" }}</p>
+            <a href="{% url 'product_list' %}" class="btn-secondary">Смотреть товары</a>
+        </div>
+        {% empty %}
+        <div class="no-categories">
+            <p>Категории временно отсутствуют</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

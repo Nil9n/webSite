@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ product.name }}{% endblock %}
+
+{% block content %}
+<div class="product-detail">
+    <div class="product-detail-grid">
+        <div class="product-image">
+            {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.name }}">
+            {% endif %}
+        </div>
+        <div class="product-info">
+            <h1>{{ product.name }}</h1>
+            <p class="product-category">Категория: {{ product.category.name }}</p>
+            <p class="product-price">{{ product.price }} руб.</p>
+            <div class="product-description">
+                <h3>Описание:</h3>
+                <p>{{ product.description }}</p>
+            </div>
+            {% if product.in_stock %}
+            <button class="btn-primary">Добавить в корзину</button>
+            {% else %}
+            <button class="btn-disabled" disabled>Нет в наличии</button>
+            {% endif %}
+            <a href="{% url 'product_list' %}" class="btn-secondary">Назад к товарам</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

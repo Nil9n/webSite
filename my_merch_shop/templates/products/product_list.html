@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Все товары{% endblock %}
+
+{% block content %}
+<div class="products-header">
+    <h1>Наши товары</h1>
+    <p>Широкий ассортимент качественной продукции</p>
+</div>
+
+<div class="products-container">
+    <div class="products-grid">
+        {% for product in products %}
+        <div class="product-card">
+            {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.name }}">
+            {% else %}
+            <img src="{% static 'images/placeholder.jpg' %}" alt="No image">
+            {% endif %}
+            <div class="product-info">
+                <h3>{{ product.name }}</h3>
+                <p class="product-price">{{ product.price }} руб.</p>
+                <p class="product-description">{{ product.description|truncatewords:20 }}</p>
+                <a href="{% url 'product_detail' product.id %}" class="btn-secondary">Подробнее</a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="no-products">
+            <p>Товары временно отсутствуют</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
