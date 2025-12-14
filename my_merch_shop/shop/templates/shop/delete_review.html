@@ -1,0 +1,108 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Удалить отзыв - Nilan Clothing</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1>Nilan Clothing</h1>
+        </div>
+        <nav>
+            <a href="/">Главная</a>
+            <a href="{% url 'shop:product_list' %}">Каталог</a>
+            <a href="{% url 'shop:cart_detail' %}">Корзина</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'users:profile' %}">Личный кабинет</a>
+                <a href="{% url 'users:logout' %}">Выйти</a>
+            {% else %}
+                <a href="{% url 'users:login' %}">Войти</a>
+                <a href="{% url 'users:register' %}">Регистрация</a>
+            {% endif %}
+        </nav>
+    </header>
+
+    <main>
+        <div class="auth-container">
+            <div class="auth-header">
+                <h2>🗑️ Удалить отзыв</h2>
+                <p style="color: #e74c3c;">Вы уверены, что хотите удалить свой отзыв?</p>
+            </div>
+
+            <div class="warning-card">
+                <div class="warning-icon">⚠️</div>
+                <div class="warning-content">
+                    <h3>Внимание!</h3>
+                    <p>Это действие нельзя отменить. После удаления:</p>
+                    <ul>
+                        <li>Ваш отзыв будет полностью удален</li>
+                        <li>Рейтинг товара может измениться</li>
+                        <li>Восстановление отзыва невозможно</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="review-preview">
+                <h4>Ваш отзыв:</h4>
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="review-rating">
+                            <span class="stars">{{ review.get_rating_stars }}</span>
+                        </div>
+                    </div>
+                    <div class="review-content">
+                        <p>{{ review.comment|default:"Без комментария" }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <form method="post" class="auth-form">
+                {% csrf_token %}
+
+                <div class="form-actions">
+                    <a href="{% url 'shop:product_detail' review.product.id %}" class="back-btn">
+                        <span class="btn-icon">←</span>
+                        Отмена
+                    </a>
+                    <button type="submit" class="delete-btn">
+                        <span class="btn-icon">🗑️</span>
+                        Удалить отзыв
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="social-links">
+                <h3>Мы в соцсетях</h3>
+                <div class="social-icons">
+                    <a href="#" class="social-link">Telegram</a>
+                    <a href="#" class="social-link">VK</a>
+                </div>
+            </div>
+
+            <div class="copyright">
+                <p>&copy; 2025 Nilan Clothing. Все права защищены.</p>
+                <p>Сайт создан с ❤️ для фанатов стиля</p>
+            </div>
+        </div>
+    </footer>
+
+    <style>
+        .review-preview {
+            margin-bottom: 2rem;
+        }
+
+        .review-preview h4 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+    </style>
+</body>
+</html>

@@ -1,0 +1,112 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Корзина - Nilan Clothing</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1>Nilan Clothing</h1>
+        </div>
+        <nav>
+            <a href="/">Главная</a>
+            <a href="{% url 'shop:product_list' %}">Каталог</a>
+            <a href="{% url 'shop:cart_detail' %}">Корзина</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'users:profile' %}">Личный кабинет</a>
+                <a href="{% url 'users:logout' %}">Выйти</a>
+            {% else %}
+                <a href="{% url 'users:login' %}">Войти</a>
+                <a href="{% url 'users:register' %}">Регистрация</a>
+            {% endif %}
+        </nav>
+    </header>
+
+    <main>
+        <section class="cart-section">
+            <div class="cart-container">
+                <h1>Корзина покупок</h1>
+
+                {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                    <div class="message {{ message.tags }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                {% if cart_empty %}
+                    <div class="empty-cart">
+                        <p>Ваша корзина пуста</p>
+                        <a href="{% url 'shop:product_list' %}" class="continue-shopping">Продолжить покупки</a>
+                    </div>
+                {% else %}
+                    <div class="cart-items">
+                        {% for item in cart_items %}
+                        <div class="cart-item">
+                            <div class="item-image">
+                                {% if item.product.image %}
+                                    <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+                                {% else %}
+                                    <img src="{% static 't-shirt.png' %}" alt="{{ item.product.name }}">
+                                {% endif %}
+                            </div>
+                            <div class="item-details">
+                                <h3>{{ item.product.name }}</h3>
+                                <p class="item-price">{{ item.product.price }} руб.</p>
+                            </div>
+                            <div class="item-quantity">
+                                <form method="post" action="{% url 'shop:update_cart_item' item.id %}">
+                                    {% csrf_token %}
+                                    <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="10" class="quantity-input">
+                                    <button type="submit" class="update-btn">Обновить</button>
+                                </form>
+                            </div>
+                            <div class="item-total">
+                                <p>{{ item.get_total_price }} руб.</p>
+                            </div>
+                            <div class="item-remove">
+                                <a href="{% url 'shop:remove_from_cart' item.id %}" class="remove-btn">Удалить</a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="cart-summary">
+                        <div class="total-price">
+                            <h3>Итого: {{ total_price }} руб.</h3>
+                        </div>
+                        <div class="cart-actions">
+                            <a href="{% url 'shop:product_list' %}" class="continue-shopping">Продолжить покупки</a>
+                            {% if not cart_empty %}
+                                <a href="{% url 'shop:order_create' %}" class="checkout-btn">Оформить заказ</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="social-links">
+                <h3>Мы в соцсетях</h3>
+                <div class="social-icons">
+                    <a href="#" class="social-link">Telegram</a>
+                    <a href="#" class="social-link">VK</a>
+                </div>
+            </div>
+
+            <div class="copyright">
+                <p>&copy; 2025 Nilan Clothing. Все права защищены.</p>
+                <p>Сайт создан с ❤️ для фанатов стиля</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

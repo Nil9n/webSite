@@ -1,12 +1,12 @@
 from django.contrib import admin
-from django.urls import path
-from django.shortcuts import render
-
-# Просто функция которая показывает твой HTML файл
-def home_page(request):
-    return render(request, 'index.html')  # если главный файл называется index.html
+from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
+from shop import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', home_page),  # главная страница
-]
+    path('', views.home, name='home'),
+    path('shop/', include('shop.urls')),
+    path('users/', include('users.urls')),  # ДОБАВЬТЕ ЭТУ СТРОКУ
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

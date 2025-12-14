@@ -1,0 +1,109 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Редактирование профиля - Nilan Clothing</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1>Nilan Clothing</h1>
+        </div>
+        <nav>
+            <a href="/">Главная</a>
+            <a href="{% url 'shop:product_list' %}">Каталог</a>
+            <a href="{% url 'shop:cart_detail' %}">Корзина</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'users:profile' %}">Личный кабинет</a>
+                <a href="{% url 'users:logout' %}">Выйти</a>
+            {% else %}
+                <a href="{% url 'users:login' %}">Войти</a>
+                <a href="{% url 'users:register' %}">Регистрация</a>
+            {% endif %}
+        </nav>
+    </header>
+
+    <main>
+        <div class="auth-container">
+            <h2>✏️ Редактирование профиля</h2>
+
+            {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                <div class="message {{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="{{ form.first_name.id_for_label }}">
+                        <span class="label-icon">👤</span>
+                        Имя
+                    </label>
+                    {{ form.first_name }}
+                    {% if form.first_name.errors %}
+                    <div class="error">{{ form.first_name.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.last_name.id_for_label }}">
+                        <span class="label-icon">👥</span>
+                        Фамилия
+                    </label>
+                    {{ form.last_name }}
+                    {% if form.last_name.errors %}
+                    <div class="error">{{ form.last_name.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.email.id_for_label }}">
+                        <span class="label-icon">📧</span>
+                        Email
+                    </label>
+                    {{ form.email }}
+                    {% if form.email.errors %}
+                    <div class="error">{{ form.email.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-actions">
+                    <a href="{% url 'users:profile' %}" class="back-btn">← Назад в профиль</a>
+                    <button type="submit" class="submit-btn">
+                        <span class="btn-icon">💾</span>
+                        Сохранить изменения
+                    </button>
+                </div>
+            </form>
+
+            <div class="profile-links">
+                <a href="{% url 'users:change_password' %}">🔐 Сменить пароль</a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="social-links">
+                <h3>Мы в соцсетях</h3>
+                <div class="social-icons">
+                    <a href="#" class="social-link">Telegram</a>
+                    <a href="#" class="social-link">VK</a>
+                </div>
+            </div>
+
+            <div class="copyright">
+                <p>&copy; 2025 Nilan Clothing. Все права защищены.</p>
+                <p>Сайт создан с ❤️ для фанатов стиля</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
