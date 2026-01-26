@@ -1,0 +1,74 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Восстановить аккаунт? - Nilan Clothing</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1>Nilan Clothing</h1>
+        </div>
+        <nav>
+            <a href="/">Главная</a>
+        </nav>
+    </header>
+
+    <main>
+        <div class="auth-container">
+            <div class="auth-header">
+                <h2>🔄 Восстановить аккаунт?</h2>
+                <p>Аккаунт <strong>{{ user.username }}</strong> был удален</p>
+            </div>
+
+            <div class="warning-card" style="background: #e8f8f7; border-color: #4ecdc4; margin-bottom: 2rem;">
+                <div class="warning-icon" style="color: #4ecdc4;">ℹ️</div>
+                <div class="warning-content">
+                    <h3 style="color: #333;">Хотите восстановить аккаунт?</h3>
+                    <p>После восстановления:</p>
+                    <ul>
+                        <li>✅ Все ваши данные будут доступны</li>
+                        <li>✅ Вы сможете продолжить покупки</li>
+                        <li>✅ История заказов сохранится</li>
+                    </ul>
+                    <p style="margin-top: 1rem; color: #666;">
+                        Осталось дней на восстановление: <strong>{{ user.get_restore_days_left }}</strong>
+                    </p>
+                </div>
+            </div>
+
+            <form method="post" class="auth-form">
+                {% csrf_token %}
+
+                <div class="form-actions" style="display: flex; gap: 1rem; justify-content: center;">
+                    <a href="{% url 'users:login' %}" class="back-btn" style="padding: 1rem 2rem;">
+                        ❌ Нет, отмена
+                    </a>
+                    <button type="submit" class="submit-btn" style="padding: 1rem 2rem;">
+                        ✅ Да, восстановить
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="social-links">
+                <h3>Мы в соцсетях</h3>
+                <div class="social-icons">
+                    <a href="#" class="social-link">Telegram</a>
+                    <a href="#" class="social-link">VK</a>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; {% now "Y" %} Nilan Clothing. Все права защищены.</p>
+                <p>Сайт создан с ❤️ для фанатов стиля</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

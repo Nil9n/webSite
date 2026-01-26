@@ -1,0 +1,171 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Удаление аккаунта - Nilan Clothing</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <style>
+    /* Стили для кнопок на странице удаления аккаунта */
+    .form-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        justify-content: center;
+        align-items: center;
+        margin-top: 2rem;
+    }
+
+    .form-actions .back-btn,
+    .form-actions .delete-btn {
+        flex: 1;
+        min-width: 200px;
+        max-width: 300px;
+        padding: 1rem 1.5rem;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        border-radius: 10px;
+        font-weight: bold;
+        transition: all 0.3s;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        height: 50px;
+        box-sizing: border-box;
+    }
+
+    .form-actions .back-btn {
+        background: #6c757d;
+        color: white;
+    }
+
+    .form-actions .back-btn:hover {
+        background: #5a6268;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .form-actions .delete-btn {
+        background: linear-gradient(135deg, #e74c3c, #c0392b);
+        color: white;
+    }
+
+    .form-actions .delete-btn:hover {
+        background: linear-gradient(135deg, #c0392b, #a93226);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+    }
+
+    /* Адаптивность */
+    @media (max-width: 600px) {
+        .form-actions {
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .form-actions .back-btn,
+        .form-actions .delete-btn {
+            width: 100%;
+            max-width: 100%;
+        }
+    }
+</style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1>Nilan Clothing</h1>
+        </div>
+        <nav>
+            <a href="/">Главная</a>
+            <a href="{% url 'shop:product_list' %}">Каталог</a>
+            <a href="{% url 'shop:cart_detail' %}">Корзина</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'users:profile' %}">Личный кабинет</a>
+                <a href="{% url 'users:logout' %}">Выйти</a>
+            {% else %}
+                <a href="{% url 'users:login' %}">Войти</a>
+                <a href="{% url 'users:register' %}">Регистрация</a>
+            {% endif %}
+        </nav>
+    </header>
+
+    <main>
+        <div class="auth-container">
+            <div class="auth-header">
+                <h2 style="color: #e74c3c;">🗑️ Удаление аккаунта</h2>
+                <p style="color: #666;">У вас есть 30 дней на восстановление</p>
+            </div>
+
+            <div class="warning-card">
+                <div class="warning-icon" style="color: #e74c3c; font-size: 2rem;">⚠️</div>
+                <div class="warning-content">
+                    <h3 style="color: #e74c3c;">Ваш аккаунт будет помечен как удаленный, но:</h3>
+                    <ul>
+                        <li>✅ Все данные сохранятся на 30 дней</li>
+                        <li>✅ Вы сможете восстановить аккаунт в течение 30 дней</li>
+                        <li>✅ История заказов сохранится после восстановления</li>
+                        <li>⏳ Через 30 дней аккаунт будет удален окончательно</li>
+                        <li>🔒 До восстановления вы не сможете войти в аккаунт</li>
+                    </ul>
+                </div>
+            </div>
+
+            <form method="post" class="auth-form">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="password">
+                        <span class="label-icon">🔒</span>
+                        Введите пароль для подтверждения
+                    </label>
+                    <input type="password" name="password" id="password" class="form-input" required placeholder="Ваш текущий пароль">
+                    {% if error %}
+                    <div class="error">{{ error }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-actions">
+                    <a href="{% url 'users:profile' %}" class="back-btn">
+                        <span class="btn-icon">←</span>
+                        Отмена
+                    </a>
+                    <button type="submit" class="delete-btn" onclick="return confirm('Вы уверены, что хотите удалить аккаунт? У вас будет 30 дней на восстановление.')">
+                        <span class="btn-icon">🗑️</span>
+                        Удалить аккаунт
+                    </button>
+                </div>
+            </form>
+
+            <div style="margin-top: 2rem; padding: 1rem; background: #e8f8f7; border-radius: 10px; border-left: 4px solid #4ecdc4;">
+                <h4 style="color: #333; margin-bottom: 0.5rem;">ℹ️ Как восстановить аккаунт:</h4>
+                <p style="color: #555; margin: 0;">
+                    Попробуйте войти в аккаунт - система предложит восстановить его.
+                    После подтверждения аккаунт будет восстановлен и вы автоматически войдете в систему.
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="social-links">
+                <h3>Мы в соцсетях</h3>
+                <div class="social-icons">
+                    <a href="#" class="social-link">Telegram</a>
+                    <a href="#" class="social-link">VK</a>
+                </div>
+            </div>
+
+            <div class="copyright">
+                <p>&copy; {% now "Y" %} Nilan Clothing. Все права защищены.</p>
+                <p>Сайт создан с ❤️ для фанатов стиля</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

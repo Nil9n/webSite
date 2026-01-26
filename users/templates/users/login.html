@@ -1,0 +1,91 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход - Nilan Clothing</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1>Nilan Clothing</h1>
+        </div>
+        <nav>
+            <a href="/">Главная</a>
+            <a href="{% url 'shop:product_list' %}">Каталог</a>
+            <a href="{% url 'shop:cart_detail' %}">Корзина</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'users:profile' %}">Личный кабинет</a>
+                <a href="{% url 'users:logout' %}">Выйти</a>
+            {% else %}
+                <a href="{% url 'users:login' %}" class="nav-active">Войти</a>
+                <a href="{% url 'users:register' %}">Регистрация</a>
+            {% endif %}
+        </nav>
+    </header>
+
+    <main>
+        <div class="auth-container">
+            <div class="auth-header">
+                <h2>👋 С возвращением!</h2>
+                <p>Войдите в ваш аккаунт Nilan</p>
+            </div>
+
+            <form method="post" class="auth-form">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="{{ form.username.id_for_label }}">
+                        <span class="label-icon">👤</span>
+                        Имя пользователя
+                    </label>
+                    {{ form.username }}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.password.id_for_label }}">
+                        <span class="label-icon">🔒</span>
+                        Пароль
+                    </label>
+                    {{ form.password }}
+                </div>
+
+                {% if form.errors %}
+                <div class="message error">
+                    Неверное имя пользователя или пароль
+                </div>
+                {% endif %}
+
+                <button type="submit" class="auth-submit-btn">
+                    <span class="btn-icon">🚀</span>
+                    Войти в аккаунт
+                </button>
+            </form>
+
+            <div class="auth-footer">
+                <p>Нет аккаунта? <a href="{% url 'users:register' %}">Зарегистрируйтесь здесь</a></p>
+                <p><a href="{% url 'password_reset' %}" class="forgot-password">Забыли пароль?</a></p>
+            </div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="social-links">
+                <h3>Мы в соцсетях</h3>
+                <div class="social-icons">
+                    <a href="#" class="social-link">Telegram</a>
+                    <a href="#" class="social-link">VK</a>
+                </div>
+            </div>
+
+            <div class="copyright">
+                <p>&copy; {% now "Y" %} Nilan Clothing. Все права защищены.</p>
+                <p>Сайт создан с ❤️ для фанатов стиля</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

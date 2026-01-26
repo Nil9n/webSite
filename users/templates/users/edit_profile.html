@@ -1,0 +1,484 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Редактирование профиля - Nilan Clothing</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <style>
+        /* ОЧЕНЬ СПЕЦИФИЧНЫЕ СЕЛЕКТОРЫ для переопределения стилей из style.css */
+        .auth-container .form-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+            align-items: center;
+            margin-top: 2rem;
+        }
+
+        .auth-container .form-actions .back-btn,
+        .auth-container .form-actions .submit-btn {
+            flex: 1;
+            min-width: 200px;
+            max-width: 300px;
+            padding: 1rem 1.5rem !important;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            border-radius: 10px;
+            font-weight: bold;
+            transition: all 0.3s;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            height: 50px !important;
+            box-sizing: border-box;
+            margin-top: 0 !important;
+        }
+
+        /* Кнопка "Назад в профиль" */
+        .auth-container .form-actions .back-btn {
+            background: #6c757d !important;
+            color: white !important;
+        }
+
+        .auth-container .form-actions .back-btn:hover {
+            background: #5a6268 !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        /* Кнопка "Сохранить изменения" */
+        .auth-container .form-actions .submit-btn {
+            background: linear-gradient(135deg, #4ecdc4, #44a08d) !important;
+            color: white !important;
+            width: auto !important;
+        }
+
+        .auth-container .form-actions .submit-btn:hover {
+            background: linear-gradient(135deg, #3bb4ac, #358f7d) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3);
+        }
+
+        /* Скрываем сообщения об ошибках */
+        .auth-container .error {
+            display: none !important;
+        }
+
+        /* Стили для всплывающих подсказок */
+        .form-group {
+            position: relative;
+        }
+
+        .field-help-tooltip {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #2c3e50;
+            color: white;
+            padding: 0.8rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            margin-top: 0.3rem;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .field-help-tooltip.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .field-help-tooltip ul {
+            margin: 0;
+            padding-left: 1.2rem;
+        }
+
+        .field-help-tooltip li {
+            margin-bottom: 0.2rem;
+            line-height: 1.3;
+        }
+
+        /* Добавляем иконку вопроса для подсказок */
+        .help-icon {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #4ecdc4;
+            cursor: help;
+            font-size: 1rem;
+        }
+
+        .form-group input {
+            padding-right: 30px !important;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 600px) {
+            .auth-container .form-actions {
+                flex-direction: column;
+                gap: 0.8rem;
+            }
+
+            .auth-container .form-actions .back-btn,
+            .auth-container .form-actions .submit-btn {
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+        }
+
+        @media (min-width: 601px) and (max-width: 900px) {
+            .auth-container .form-actions {
+                gap: 0.8rem;
+            }
+
+            .auth-container .form-actions .back-btn,
+            .auth-container .form-actions .submit-btn {
+                min-width: 180px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1>Nilan Clothing</h1>
+        </div>
+        <nav>
+            <a href="/">Главная</a>
+            <a href="{% url 'shop:product_list' %}">Каталог</a>
+            <a href="{% url 'shop:cart_detail' %}">Корзина</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'users:profile' %}">Личный кабинет</a>
+                <a href="{% url 'users:logout' %}">Выйти</a>
+            {% else %}
+                <a href="{% url 'users:login' %}">Войти</a>
+                <a href="{% url 'users:register' %}">Регистрация</a>
+            {% endif %}
+        </nav>
+    </header>
+
+    <main>
+        <div class="auth-container">
+            <h2 style="color: #333;">✏️ Редактирование профиля</h2>
+
+            {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                <div class="message {{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <form method="post" id="editProfileForm">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="{{ form.first_name.id_for_label }}">
+                        <span class="label-icon">👤</span>
+                        Имя
+                    </label>
+                    {{ form.first_name }}
+                    <span class="help-icon" title="Показать подсказку">?</span>
+                    <div class="field-help-tooltip">
+                        <strong>Требования к имени:</strong>
+                        <ul>
+                            <li>Минимум 2 символа</li>
+                            <li>Может содержать буквы, дефисы и пробелы</li>
+                            <li>Обязательно для заполнения</li>
+                        </ul>
+                    </div>
+                    <!-- Убираем отображение ошибок -->
+                    {% if form.first_name.errors %}
+                    <div class="error" style="display: none;">{{ form.first_name.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.last_name.id_for_label }}">
+                        <span class="label-icon">👥</span>
+                        Фамилия
+                    </label>
+                    {{ form.last_name }}
+                    <span class="help-icon" title="Показать подсказку">?</span>
+                    <div class="field-help-tooltip">
+                        <strong>Требования к фамилии:</strong>
+                        <ul>
+                            <li>Минимум 2 символа</li>
+                            <li>Может содержать буквы, дефисы и пробелы</li>
+                            <li>Обязательно для заполнения</li>
+                        </ul>
+                    </div>
+                    <!-- Убираем отображение ошибок -->
+                    {% if form.last_name.errors %}
+                    <div class="error" style="display: none;">{{ form.last_name.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.email.id_for_label }}">
+                        <span class="label-icon">📧</span>
+                        Email
+                    </label>
+                    {{ form.email }}
+                    <span class="help-icon" title="Показать подсказку">?</span>
+                    <div class="field-help-tooltip">
+                        <strong>Требования к email:</strong>
+                        <ul>
+                            <li>Должен быть валидным email-адресом</li>
+                            <li>Пример: example@mail.ru</li>
+                            <li>Обязательно для заполнения</li>
+                        </ul>
+                    </div>
+                    <!-- Убираем отображение ошибок -->
+                    {% if form.email.errors %}
+                    <div class="error" style="display: none;">{{ form.email.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-actions">
+                    <a href="{% url 'users:profile' %}" class="back-btn">
+                        <span class="btn-icon">←</span>
+                        Назад в профиль
+                    </a>
+                    <button type="submit" class="submit-btn">
+                        <span class="btn-icon">💾</span>
+                        Сохранить изменения
+                    </button>
+                </div>
+            </form>
+
+            <div class="profile-links" style="margin-top: 2rem; text-align: center;">
+                <a href="{% url 'users:change_password' %}" style="color: #4ecdc4; text-decoration: none; font-weight: bold;">
+                    🔐 Сменить пароль
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="social-links">
+                <h3>Мы в соцсетях</h3>
+                <div class="social-icons">
+                    <a href="#" class="social-link">Telegram</a>
+                    <a href="#" class="social-link">VK</a>
+                </div>
+            </div>
+
+            <div class="copyright">
+                <p>&copy; {% now "Y" %} Nilan Clothing. Все права защищены.</p>
+                <p>Сайт создан с ❤️ для фанатов стиля</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Находим все поля формы
+            const form = document.getElementById('editProfileForm');
+            const helpIcons = document.querySelectorAll('.help-icon');
+            const helpTooltips = document.querySelectorAll('.field-help-tooltip');
+            const inputs = document.querySelectorAll('.form-group input');
+
+            // Добавляем placeholder к полям
+            const firstNameField = document.getElementById('{{ form.first_name.id_for_label }}');
+            const lastNameField = document.getElementById('{{ form.last_name.id_for_label }}');
+            const emailField = document.getElementById('{{ form.email.id_for_label }}');
+
+            if (firstNameField) {
+                firstNameField.placeholder = 'Введите ваше имя';
+            }
+            if (lastNameField) {
+                lastNameField.placeholder = 'Введите вашу фамилию';
+            }
+            if (emailField) {
+                emailField.placeholder = 'Введите ваш email';
+            }
+
+            // Управление всплывающими подсказками при клике на иконку "?"
+            helpIcons.forEach((icon, index) => {
+                icon.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    // Скрываем все подсказки
+                    helpTooltips.forEach(tooltip => {
+                        tooltip.classList.remove('active');
+                    });
+
+                    // Показываем/скрываем текущую подсказку
+                    const tooltip = this.nextElementSibling;
+                    if (tooltip && tooltip.classList.contains('field-help-tooltip')) {
+                        const isActive = tooltip.classList.contains('active');
+                        tooltip.classList.toggle('active', !isActive);
+                    }
+                });
+            });
+
+            // Показываем подсказку при фокусе на поле
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    // Скрываем все подсказки от иконок
+                    helpTooltips.forEach(tooltip => {
+                        tooltip.classList.remove('active');
+                    });
+
+                    // Показываем подсказку для текущего поля
+                    const tooltip = this.parentNode.querySelector('.field-help-tooltip');
+                    if (tooltip) {
+                        tooltip.classList.add('active');
+                    }
+                });
+
+                input.addEventListener('blur', function() {
+                    // Скрываем подсказку с задержкой
+                    const tooltip = this.parentNode.querySelector('.field-help-tooltip');
+                    if (tooltip) {
+                        setTimeout(() => {
+                            tooltip.classList.remove('active');
+                        }, 200);
+                    }
+                });
+            });
+
+            // Скрываем все подсказки при клике вне
+            document.addEventListener('click', function(e) {
+                if (!e.target.matches('.help-icon, .field-help-tooltip, .field-help-tooltip *') &&
+                    !Array.from(inputs).some(input => input.contains(e.target))) {
+                    helpTooltips.forEach(tooltip => {
+                        tooltip.classList.remove('active');
+                    });
+                }
+            });
+
+            // Добавляем валидацию при отправке формы
+            form.addEventListener('submit', function(e) {
+                let isValid = true;
+                const errorMessages = [];
+
+                // Проверяем имя
+                const firstName = firstNameField ? firstNameField.value.trim() : '';
+                if (firstName.length < 2) {
+                    isValid = false;
+                    errorMessages.push('Имя должно содержать минимум 2 символа');
+                    if (firstNameField) {
+                        firstNameField.style.borderColor = '#e74c3c';
+                    }
+                } else {
+                    // Проверяем, что имя содержит допустимые символы (буквы, дефисы, пробелы)
+                    const namePattern = /^[A-Za-zА-Яа-яЁё\s\-]+$/;
+                    if (!namePattern.test(firstName)) {
+                        isValid = false;
+                        errorMessages.push('Имя может содержать только буквы, дефисы и пробелы');
+                        if (firstNameField) {
+                            firstNameField.style.borderColor = '#e74c3c';
+                        }
+                    }
+                }
+
+                // Проверяем фамилию
+                const lastName = lastNameField ? lastNameField.value.trim() : '';
+                if (lastName.length < 2) {
+                    isValid = false;
+                    errorMessages.push('Фамилия должна содержать минимум 2 символа');
+                    if (lastNameField) {
+                        lastNameField.style.borderColor = '#e74c3c';
+                    }
+                } else {
+                    // Проверяем, что фамилия содержит допустимые символы
+                    const namePattern = /^[A-Za-zА-Яа-яЁё\s\-]+$/;
+                    if (!namePattern.test(lastName)) {
+                        isValid = false;
+                        errorMessages.push('Фамилия может содержать только буквы, дефисы и пробелы');
+                        if (lastNameField) {
+                            lastNameField.style.borderColor = '#e74c3c';
+                        }
+                    }
+                }
+
+                // Проверяем email
+                const email = emailField ? emailField.value.trim() : '';
+                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!email || !emailPattern.test(email)) {
+                    isValid = false;
+                    errorMessages.push('Введите корректный email адрес');
+                    if (emailField) {
+                        emailField.style.borderColor = '#e74c3c';
+                    }
+                }
+
+                if (!isValid) {
+                    e.preventDefault();
+
+                    // Показываем общее сообщение об ошибке
+                    let errorContainer = document.querySelector('.error-messages');
+                    if (!errorContainer) {
+                        errorContainer = document.createElement('div');
+                        errorContainer.className = 'message error error-messages';
+                        form.insertBefore(errorContainer, form.firstChild);
+                    }
+
+                    errorContainer.innerHTML = '<strong>Пожалуйста, исправьте следующие ошибки:</strong><ul>' +
+                        errorMessages.map(msg => `<li>${msg}</li>`).join('') + '</ul>';
+
+                    // Прокручиваем к ошибке
+                    errorContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            });
+
+            // Сбрасываем цвет рамки при вводе
+            inputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    this.style.borderColor = '';
+
+                    // Скрываем общее сообщение об ошибке
+                    const errorContainer = document.querySelector('.error-messages');
+                    if (errorContainer) {
+                        errorContainer.remove();
+                    }
+                });
+            });
+
+            // Запрещаем ввод цифр и специальных символов в поля имени и фамилии
+            const nameFields = [firstNameField, lastNameField];
+
+            nameFields.forEach(field => {
+                if (field) {
+                    field.addEventListener('input', function(e) {
+                        // Удаляем цифры и недопустимые символы
+                        this.value = this.value.replace(/[^A-Za-zА-Яа-яЁё\s\-]/g, '');
+
+                        // Убираем множественные пробелы
+                        this.value = this.value.replace(/\s+/g, ' ');
+
+                        // Запрещаем начинать с пробела
+                        if (this.value.startsWith(' ')) {
+                            this.value = this.value.trim();
+                        }
+                    });
+
+                    // Запрещаем вставлять цифры и недопустимые символы
+                    field.addEventListener('paste', function(e) {
+                        e.preventDefault();
+                        const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+                        const cleanText = pastedText.replace(/[^A-Za-zА-Яа-яЁё\s\-]/g, '');
+                        document.execCommand('insertText', false, cleanText);
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

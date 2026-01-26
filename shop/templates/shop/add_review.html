@@ -1,0 +1,555 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Написать отзыв - Nilan Clothing</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <style>
+        /* Стили для кнопок на странице отзыва */
+        .auth-container .form-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+            align-items: center;
+            margin-top: 2rem;
+        }
+
+        .auth-container .form-actions .back-btn,
+        .auth-container .form-actions .submit-btn {
+            flex: 1;
+            min-width: 200px;
+            max-width: 300px;
+            padding: 1rem 1.5rem !important;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            border-radius: 10px;
+            font-weight: bold;
+            transition: all 0.3s;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            height: 50px !important;
+            box-sizing: border-box;
+            margin-top: 0 !important;
+        }
+
+        .auth-container .form-actions .back-btn {
+            background: #6c757d !important;
+            color: white !important;
+        }
+
+        .auth-container .form-actions .back-btn:hover {
+            background: #5a6268 !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .auth-container .form-actions .submit-btn {
+            background: linear-gradient(135deg, #4ecdc4, #44a08d) !important;
+            color: white !important;
+            width: auto !important;
+        }
+
+        .auth-container .form-actions .submit-btn:hover {
+            background: linear-gradient(135deg, #3bb4ac, #358f7d) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3);
+        }
+
+        /* Стили для всплывающих подсказок */
+        .form-group {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Добавляем иконку вопроса для подсказок */
+        .help-icon {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #4ecdc4;
+            cursor: help;
+            font-size: 1rem;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            padding-right: 30px !important;
+        }
+
+        /* Красная обводка для невалидных полей */
+        .form-group input.error-field,
+        .form-group textarea.error-field {
+            border-color: #e74c3c !important;
+            box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1) !important;
+        }
+
+        /* Обводка для невыбранного рейтинга */
+        .rating-group.error-field .rating-options {
+            position: relative;
+        }
+
+        .rating-group.error-field::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 2px solid #e74c3c;
+            border-radius: 8px;
+            pointer-events: none;
+            box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+        }
+
+        /* Стили для подсказок (как на других страницах) */
+        .help-tooltip {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #2c3e50;
+            color: white;
+            padding: 0.8rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            margin-top: 0.3rem;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .help-tooltip.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .help-tooltip ul {
+            margin: 0;
+            padding-left: 1.2rem;
+        }
+
+        .help-tooltip li {
+            margin-bottom: 0.2rem;
+            line-height: 1.3;
+        }
+
+        /* Стили для рейтинга */
+        .rating-options {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 0.5rem;
+            position: relative;
+            padding: 5px;
+        }
+
+        .rating-option {
+            display: flex;
+            align-items: center;
+        }
+
+        .rating-option input[type="radio"] {
+            display: none;
+        }
+
+        .rating-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 0.8rem 1rem;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .rating-label:hover {
+            border-color: #4ecdc4;
+            background: #f8f9fa;
+        }
+
+        .rating-option input[type="radio"]:checked + .rating-label {
+            border-color: #4ecdc4;
+            background: #e8f8f7;
+            transform: scale(1.05);
+        }
+
+        .rating-stars {
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+
+        /* Скрываем сообщения об ошибках Django и JavaScript */
+        .auth-container .error,
+        .field-error {
+            display: none !important;
+        }
+
+        /* Общее сообщение об ошибках */
+        .error-messages {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            border: 2px solid #f5c6cb;
+        }
+
+        .error-messages strong {
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .error-messages ul {
+            margin: 0;
+            padding-left: 1.2rem;
+        }
+
+        .error-messages li {
+            margin-bottom: 0.3rem;
+        }
+
+        .error-messages li:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 600px) {
+            .auth-container .form-actions {
+                flex-direction: column;
+                gap: 0.8rem;
+            }
+
+            .auth-container .form-actions .back-btn,
+            .auth-container .form-actions .submit-btn {
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+
+            .rating-options {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1>Nilan Clothing</h1>
+        </div>
+        <nav>
+            <a href="/">Главная</a>
+            <a href="{% url 'shop:product_list' %}">Каталог</a>
+            <a href="{% url 'shop:cart_detail' %}">Корзина</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'users:profile' %}">Личный кабинет</a>
+                <a href="{% url 'users:logout' %}">Выйти</a>
+            {% else %}
+                <a href="{% url 'users:login' %}">Войти</a>
+                <a href="{% url 'users:register' %}">Регистрация</a>
+            {% endif %}
+        </nav>
+    </header>
+
+    <main>
+        <div class="auth-container">
+            <div class="auth-header">
+                <h2>✍️ Написать отзыв</h2>
+                <p>О товаре: <strong>{{ product.name }}</strong></p>
+            </div>
+
+            {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                <div class="message {{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <form method="post" class="auth-form" id="reviewForm">
+                {% csrf_token %}
+
+                <div class="form-group rating-group" id="ratingGroup">
+                    <label>
+                        <span class="label-icon">⭐</span>
+                        Ваша оценка
+                    </label>
+                    <div class="rating-options">
+                        {% for choice in form.rating %}
+                        <div class="rating-option">
+                            {{ choice.tag }}
+                            <label for="{{ choice.id_for_label }}" class="rating-label" data-rating="{{ choice.choice_label }}">
+                                <span class="rating-stars">{{ choice.choice_label }}</span>
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <span class="help-icon" title="Показать подсказку">?</span>
+                    <div class="help-tooltip">
+                        <strong>Требования к оценке:</strong>
+                        <ul>
+                            <li>Выберите оценку от 1 до 5 звезд</li>
+                            <li>1 звезда - очень плохо</li>
+                            <li>5 звезд - отлично</li>
+                            <li>Обязательно для заполнения</li>
+                        </ul>
+                    </div>
+                    <!-- Убираем отображение ошибок -->
+                    {% if form.rating.errors %}
+                    <div class="error" style="display: none;">{{ form.rating.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.comment.id_for_label }}">
+                        <span class="label-icon">📝</span>
+                        Комментарий
+                    </label>
+                    {{ form.comment }}
+                    <span class="help-icon" title="Показать подсказку">?</span>
+                    <div class="help-tooltip">
+                        <strong>Требования к комментарию:</strong>
+                        <ul>
+                            <li>Минимум 10 символов</li>
+                            <li>Обязательно для заполнения</li>
+                        </ul>
+                    </div>
+                    <!-- Убираем отображение ошибок -->
+                    {% if form.comment.errors %}
+                    <div class="error" style="display: none;">{{ form.comment.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-actions">
+                    <a href="{% url 'shop:product_detail' product.id %}" class="back-btn">
+                        <span class="btn-icon">←</span>
+                        Назад к товару
+                    </a>
+                    <button type="submit" class="submit-btn" id="submitBtn">
+                        <span class="btn-icon">💫</span>
+                        Опубликовать отзыв
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="social-links">
+                <h3>Мы в соцсетях</h3>
+                <div class="social-icons">
+                    <a href="#" class="social-link">Telegram</a>
+                    <a href="#" class="social-link">VK</a>
+                </div>
+            </div>
+
+            <div class="copyright">
+                <p>&copy; {% now "Y" %} Nilan Clothing. Все права защищены.</p>
+                <p>Сайт создан с ❤️ для фанатов стиля</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Находим все элементы
+            const form = document.getElementById('reviewForm');
+            const helpIcons = document.querySelectorAll('.help-icon');
+            const helpTooltips = document.querySelectorAll('.help-tooltip');
+            const inputs = document.querySelectorAll('.form-group input, .form-group textarea');
+            const ratingInputs = document.querySelectorAll('input[name="rating"]');
+            const ratingGroup = document.getElementById('ratingGroup');
+            const commentInput = document.getElementById('{{ form.comment.id_for_label }}');
+
+            // Управление всплывающими подсказками при клике на иконку "?"
+            helpIcons.forEach((icon, index) => {
+                icon.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    // Скрываем все подсказки
+                    helpTooltips.forEach(tooltip => {
+                        tooltip.classList.remove('active');
+                    });
+
+                    // Показываем/скрываем текущую подсказку
+                    const tooltip = this.nextElementSibling;
+                    if (tooltip && tooltip.classList.contains('help-tooltip')) {
+                        const isActive = tooltip.classList.contains('active');
+                        tooltip.classList.toggle('active', !isActive);
+                    }
+                });
+            });
+
+            // Показываем подсказку при фокусе на поле
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    // Скрываем все подсказки от иконок
+                    helpTooltips.forEach(tooltip => {
+                        tooltip.classList.remove('active');
+                    });
+
+                    // Показываем подсказку для текущего поля
+                    const tooltip = this.parentNode.querySelector('.help-tooltip');
+                    if (tooltip) {
+                        tooltip.classList.add('active');
+                    }
+                });
+
+                input.addEventListener('blur', function() {
+                    // Скрываем подсказку с задержкой
+                    const tooltip = this.parentNode.querySelector('.help-tooltip');
+                    if (tooltip) {
+                        setTimeout(() => {
+                            tooltip.classList.remove('active');
+                        }, 200);
+                    }
+                });
+            });
+
+            // Скрываем все подсказки при клике вне
+            document.addEventListener('click', function(e) {
+                if (!e.target.matches('.help-icon, .help-tooltip, .help-tooltip *') &&
+                    !Array.from(inputs).some(input => input.contains(e.target)) &&
+                    !Array.from(ratingInputs).some(input => input.contains(e.target)) &&
+                    !Array.from(document.querySelectorAll('.rating-label')).some(label => label.contains(e.target))) {
+                    helpTooltips.forEach(tooltip => {
+                        tooltip.classList.remove('active');
+                    });
+                }
+            });
+
+            // Также показываем подсказку при клике на звезды рейтинга
+            ratingInputs.forEach(input => {
+                const ratingOption = input.closest('.rating-option');
+                const ratingLabel = ratingOption ? ratingOption.querySelector('.rating-label') : null;
+
+                if (ratingLabel) {
+                    ratingLabel.addEventListener('focus', function() {
+                        // Скрываем все подсказки от иконок
+                        helpTooltips.forEach(tooltip => {
+                            tooltip.classList.remove('active');
+                        });
+
+                        // Показываем подсказку для рейтинга
+                        const tooltip = ratingGroup.querySelector('.help-tooltip');
+                        if (tooltip) {
+                            tooltip.classList.add('active');
+                        }
+                    });
+                }
+
+                input.addEventListener('change', function() {
+                    // Скрываем подсказку с задержкой после выбора рейтинга
+                    const tooltip = ratingGroup.querySelector('.help-tooltip');
+                    if (tooltip) {
+                        setTimeout(() => {
+                            tooltip.classList.remove('active');
+                        }, 500);
+                    }
+
+                    // Убираем красную обводку при выборе рейтинга
+                    ratingGroup.classList.remove('error-field');
+
+                    // Скрываем общее сообщение об ошибке
+                    const errorContainer = document.querySelector('.error-messages');
+                    if (errorContainer) {
+                        errorContainer.remove();
+                    }
+                });
+            });
+
+            // Добавляем валидацию при отправке формы
+            form.addEventListener('submit', function(e) {
+                let isValid = true;
+                const errorMessages = [];
+
+                // Убираем все предыдущие красные обводки
+                ratingGroup.classList.remove('error-field');
+                if (commentInput) {
+                    commentInput.classList.remove('error-field');
+                }
+
+                // Проверяем рейтинг
+                const selectedRating = document.querySelector('input[name="rating"]:checked');
+                if (!selectedRating) {
+                    isValid = false;
+                    errorMessages.push('Пожалуйста, выберите оценку');
+                    ratingGroup.classList.add('error-field');
+                }
+
+                // Проверяем комментарий (минимум 10 символов)
+                const commentValue = commentInput ? commentInput.value.trim() : '';
+                if (!commentValue) {
+                    isValid = false;
+                    errorMessages.push('Пожалуйста, напишите комментарий');
+                    if (commentInput) {
+                        commentInput.classList.add('error-field');
+                    }
+                } else if (commentValue.length < 10) {
+                    isValid = false;
+                    errorMessages.push('Комментарий должен содержать минимум 10 символов');
+                    if (commentInput) {
+                        commentInput.classList.add('error-field');
+                    }
+                }
+
+                if (!isValid) {
+                    e.preventDefault();
+
+                    // Показываем общее сообщение об ошибке
+                    let errorContainer = document.querySelector('.error-messages');
+                    if (!errorContainer) {
+                        errorContainer = document.createElement('div');
+                        errorContainer.className = 'message error error-messages';
+                        form.insertBefore(errorContainer, form.firstChild);
+                    }
+
+                    errorContainer.innerHTML = '<strong>Пожалуйста, исправьте следующие ошибки:</strong><ul>' +
+                        errorMessages.map(msg => `<li>${msg}</li>`).join('') + '</ul>';
+
+                    // Прокручиваем к ошибке
+                    errorContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            });
+
+            // Сбрасываем красную обводку и скрываем ошибки при вводе
+            if (commentInput) {
+                commentInput.addEventListener('input', function() {
+                    this.classList.remove('error-field');
+
+                    const errorContainer = document.querySelector('.error-messages');
+                    if (errorContainer) {
+                        errorContainer.remove();
+                    }
+                });
+            }
+
+            // Сбрасываем красную обводку для рейтинга при клике на любую звезду
+            ratingInputs.forEach(input => {
+                input.addEventListener('change', function() {
+                    ratingGroup.classList.remove('error-field');
+
+                    const errorContainer = document.querySelector('.error-messages');
+                    if (errorContainer) {
+                        errorContainer.remove();
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,108 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>История заказов - Nilan Clothing</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1>Nilan Clothing</h1>
+        </div>
+        <nav>
+            <a href="/">Главная</a>
+            <a href="{% url 'shop:product_list' %}">Каталог</a>
+            <a href="{% url 'shop:cart_detail' %}">Корзина</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'users:profile' %}">Личный кабинет</a>
+                <a href="{% url 'users:logout' %}">Выйти</a>
+            {% else %}
+                <a href="{% url 'users:login' %}">Войти</a>
+                <a href="{% url 'users:register' %}">Регистрация</a>
+            {% endif %}
+        </nav>
+    </header>
+
+    <main>
+        <section class="order-history-section">
+            <div class="order-history-container">
+                <h1>История заказов</h1>
+
+                {% if orders %}
+                    <div class="orders-list">
+                        {% for order in orders %}
+                        <div class="order-card">
+                            <div class="order-header">
+                                <div class="order-info">
+                                    <h3>Заказ #{{ order.id }}</h3>
+                                    <p class="order-date">{{ order.created|date:"d.m.Y H:i" }}</p>
+                                </div>
+                                <div class="order-status">
+                                    <span class="status-badge {{ order.status }}">{{ order.get_status_display_with_icon }}</span>
+                                </div>
+                            </div>
+
+                            <div class="order-content">
+                                <div class="order-items-preview">
+                                    {% for item in order.items.all|slice:":3" %}
+                                    <div class="preview-item">
+                                        {% if item.product.image %}
+                                            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+                                        {% else %}
+                                            <img src="{% static 't-shirt.png' %}" alt="{{ item.product.name }}">
+                                        {% endif %}
+                                        <span>{{ item.product.name }}</span>
+                                    </div>
+                                    {% endfor %}
+                                    {% if order.items.count > 3 %}
+                                    <div class="more-items">+{{ order.items.count|add:"-3" }} ещё</div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="order-summary">
+                                    <div class="order-total">
+                                        <strong>{{ order.total_price }} руб.</strong>
+                                    </div>
+                                    <div class="order-actions">
+                                        <a href="{% url 'shop:order_detail' order.id %}" class="view-details-btn">Подробнее</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="no-orders">
+                        <div class="empty-state">
+                            <div class="empty-icon">📦</div>
+                            <h3>Заказов пока нет</h3>
+                            <p>Совершите первую покупку и она появится здесь</p>
+                            <a href="{% url 'shop:product_list' %}" class="empty-action">Начать покупки</a>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="social-links">
+                <h3>Мы в соцсетях</h3>
+                <div class="social-icons">
+                    <a href="#" class="social-link">Telegram</a>
+                    <a href="#" class="social-link">VK</a>
+                </div>
+            </div>
+
+            <div class="copyright">
+                <p>&copy; {% now "Y" %} Nilan Clothing. Все права защищены.</p>
+                <p>Сайт создан с ❤️ для фанатов стиля</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

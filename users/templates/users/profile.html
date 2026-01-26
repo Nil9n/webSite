@@ -1,0 +1,229 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный кабинет - Nilan Clothing</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1>Nilan Clothing</h1>
+        </div>
+        <nav>
+            <a href="/">Главная</a>
+            <a href="{% url 'shop:product_list' %}">Каталог</a>
+            <a href="{% url 'shop:cart_detail' %}">Корзина</a>
+            <a href="{% url 'users:profile' %}" class="nav-active">Личный кабинет</a>
+            <a href="{% url 'users:logout' %}">Выйти</a>
+        </nav>
+    </header>
+
+    <main>
+        <div class="profile-dashboard">
+            {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                <div class="message {{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% if user.is_deleted %}
+            <div class="warning-card" style="background: #fff3cd; border: 2px solid #ffeaa7; margin-bottom: 2rem; padding: 1.5rem; border-radius: 10px;">
+                <h3 style="color: #856404; margin-bottom: 1rem;">⚠️ Аккаунт удален</h3>
+                <p style="color: #856404; margin-bottom: 0.5rem;">
+                    Для восстановления перейдите на
+                    <a href="{% url 'users:restore_account' %}" style="color: #4ecdc4; font-weight: bold;">
+                        страницу восстановления
+                    </a>
+                </p>
+                <p style="color: #856404; font-size: 0.9rem;">
+                    Осталось дней: <strong>{{ user.get_restore_days_left }}</strong>
+                </p>
+            </div>
+            {% endif %}
+
+            <div class="profile-header">
+                <div class="profile-avatar-section">
+                    <div class="avatar-circle">
+                        {{ user.username|first|upper }}
+                    </div>
+                    <div class="avatar-info">
+                        <h2>Привет, {{ user.username }}! 👋</h2>
+                        <p>На стиле с {{ user.date_joined|date:"d.m.Y" }}</p>
+                    </div>
+                </div>
+
+                <div class="stats-rectangle-grid">
+                    <!-- Заказы -->
+                    <div class="rectangle-stat-card">
+                        <div class="rectangle-stat-icon">📦</div>
+                        <div class="rectangle-stat-content">
+                            <div class="rectangle-stat-number">{{ user.orders.count }}</div>
+                            <div class="rectangle-stat-label">Заказов</div>
+                            <div class="rectangle-stat-subtext">Всего оформлено</div>
+                        </div>
+                    </div>
+
+                    <!-- Год с нами -->
+                    <div class="rectangle-stat-card">
+                        <div class="rectangle-stat-icon">📅</div>
+                        <div class="rectangle-stat-content">
+                            <div class="rectangle-stat-number">{{ user.get_years_with_us }}</div>
+                            <div class="rectangle-stat-label">Год с нами</div>
+                            <div class="rectangle-stat-subtext">Рады вам!</div>
+                        </div>
+                    </div>
+
+                    <!-- Корзина -->
+                    <div class="rectangle-stat-card">
+                        <div class="rectangle-stat-icon">🛒</div>
+                        <div class="rectangle-stat-content">
+                            {% with cart=user.get_cart %}
+                            <div class="rectangle-stat-number">{{ cart.items.count }}</div>
+                            <div class="rectangle-stat-label">В корзине</div>
+                            <div class="rectangle-stat-subtext">
+                                {% if cart.items.count > 0 %}
+                                    {{ cart.get_total_price }} ₽
+                                {% else %}
+                                    Пусто
+                                {% endif %}
+                            </div>
+                            {% endwith %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-content">
+                <div class="profile-sidebar">
+                    <div class="info-card">
+                        <h3>📊 Основная информация</h3>
+                        <div class="info-list">
+                            <div class="info-item">
+                                <span class="info-label">Логин:</span>
+                                <span class="info-value">{{ user.username }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Email:</span>
+                                <span class="info-value">{{ user.email|default:"Не указан" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Имя:</span>
+                                <span class="info-value">{{ user.first_name|default:"—" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Фамилия:</span>
+                                <span class="info-value">{{ user.last_name|default:"—" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Регистрация:</span>
+                                <span class="info-value">{{ user.date_joined|date:"d.m.Y H:i" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Последний вход:</span>
+                                <span class="info-value">{{ user.last_login|date:"d.m.Y H:i"|default:"Первый вход" }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="quick-actions-card">
+                        <h3>⚡ Быстрые действия</h3>
+                        <div class="quick-actions">
+                            <a href="{% url 'shop:product_list' %}" class="quick-action">
+                                <span class="action-icon">🛍️</span>
+                                <span class="action-text">Продолжить покупки</span>
+                            </a>
+                            <a href="{% url 'shop:order_history' %}" class="quick-action">
+                                <span class="action-icon">📦</span>
+                                <span class="action-text">Мои заказы</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-main">
+                    <div class="management-card">
+                        <h3>🔧 Управление аккаунтом</h3>
+                        <div class="management-grid">
+                            <a href="{% url 'users:edit_profile' %}" class="management-item">
+                                <div class="management-icon">✏️</div>
+                                <div class="management-content">
+                                    <h4>Редактировать профиль</h4>
+                                    <p>Изменить личную информацию</p>
+                                </div>
+                                <div class="management-arrow">→</div>
+                            </a>
+                            <a href="{% url 'users:change_password' %}" class="management-item">
+                                <div class="management-icon">🔐</div>
+                                <div class="management-content">
+                                    <h4>Сменить пароль</h4>
+                                    <p>Обновить пароль для безопасности</p>
+                                </div>
+                                <div class="management-arrow">→</div>
+                            </a>
+                            <a href="{% url 'users:delete_account' %}" class="management-item delete-item">
+                                <div class="management-icon">🗑️</div>
+                                <div class="management-content">
+                                    <h4>Удалить аккаунт</h4>
+                                    <p>Мягкое удаление профиля</p>
+                                </div>
+                                <div class="management-arrow">→</div>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="orders-card">
+                        <h3>📦 Последние заказы</h3>
+                        {% with orders=user.orders.all|slice:":3" %}
+                            {% if orders %}
+                                <div class="recent-orders">
+                                    {% for order in orders %}
+                                    <div class="recent-order">
+                                        <div class="order-mini-info">
+                                            <span class="order-id">Заказ #{{ order.id }}</span>
+                                            <span class="order-date">{{ order.created|date:"d.m.Y" }}</span>
+                                            <span class="order-status {{ order.status }}">{{ order.get_status_display_with_icon }}</span>
+                                        </div>
+                                        <div class="order-mini-total">{{ order.total_price }} ₽</div>
+                                        <a href="{% url 'shop:order_detail' order.id %}" class="order-mini-link">→</a>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                <div class="view-all-orders">
+                                    <a href="{% url 'shop:order_history' %}">Посмотреть всю историю →</a>
+                                </div>
+                            {% else %}
+                                <div class="orders-empty">
+                                    <div class="empty-icon">📭</div>
+                                    <h4>Заказов пока нет</h4>
+                                    <a href="{% url 'shop:product_list' %}" class="empty-action">Начать покупки</a>
+                                </div>
+                            {% endif %}
+                        {% endwith %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="social-links">
+                <h3>Мы в соцсетях</h3>
+                <div class="social-icons">
+                    <a href="#" class="social-link">Telegram</a>
+                    <a href="#" class="social-link">VK</a>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; {% now "Y" %} Nilan Clothing. Все права защищены.</p>
+                <p>Сайт создан с ❤️ для фанатов стиля</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

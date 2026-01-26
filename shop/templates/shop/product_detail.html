@@ -1,0 +1,294 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ product.name }} - Nilan Clothing</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1>Nilan Clothing</h1>
+        </div>
+        <nav>
+            <a href="/">Главная</a>
+            <a href="{% url 'shop:product_list' %}">Каталог</a>
+            <a href="{% url 'shop:cart_detail' %}">Корзина</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'users:profile' %}">Личный кабинет</a>
+                <a href="{% url 'users:logout' %}">Выйти</a>
+            {% else %}
+                <a href="{% url 'users:login' %}">Войти</a>
+                <a href="{% url 'users:register' %}">Регистрация</a>
+            {% endif %}
+        </nav>
+    </header>
+
+    <main>
+        <section class="product-detail-section">
+            <div class="product-detail-card">
+                <!-- Хлебные крошки -->
+                <div class="breadcrumbs">
+                    <a href="{% url 'shop:product_list' %}">Каталог</a>
+                    <span> / </span>
+                    <a href="{% url 'shop:product_list' %}?category={{ product.category.slug }}">{{ product.category.name }}</a>
+                    <span> / </span>
+                    <span class="current">{{ product.name }}</span>
+                </div>
+
+                <div class="product-detail-content">
+                    <!-- Изображение товара -->
+                    <div class="product-image-section">
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="main-product-image">
+                        {% else %}
+                            <img src="{% static 't-shirt.png' %}" alt="{{ product.name }}" class="main-product-image">
+                        {% endif %}
+                    </div>
+
+                    <!-- Информация о товаре -->
+                    <div class="product-info-section">
+                        <div class="product-header">
+                            <h1>{{ product.name }}</h1>
+                            <span class="product-category-badge">{{ product.category.name }}</span>
+                        </div>
+
+                        <div class="product-meta">
+                            <div class="product-rating">
+                                <span class="rating-stars">
+                                    {% if average_rating > 0 %}
+                                        {% for i in "12345" %}
+                                            {% if forloop.counter <= average_rating %}
+                                                ⭐
+                                            {% else %}
+                                                ☆
+                                            {% endif %}
+                                        {% endfor %}
+                                        <span class="rating-text">({{ average_rating|floatformat:1 }}/5)</span>
+                                    {% else %}
+                                        <span style="color: #999; font-size: 1.2rem;">☆☆☆☆☆</span>
+                                        <span class="rating-text">Нет оценок</span>
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <div class="product-availability">
+                                {% if product.available %}
+                                    <span class="available">✅ В наличии</span>
+                                {% else %}
+                                    <span class="not-available">❌ Нет в наличии</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Добавленный блок количества товара -->
+                        <div class="product-stock">
+                            {% if product.is_in_stock %}
+                                <span class="available">✅ В наличии: {{ product.stock }} шт.</span>
+                            {% else %}
+                                <span class="not-available">❌ Нет в наличии</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="product-description">
+                            <h3>Описание</h3>
+                            <p>{{ product.description }}</p>
+                        </div>
+
+                        <div class="product-features">
+                            <h3>Характеристики</h3>
+                            <ul>
+                                <li>📏 Высокое качество материалов</li>
+                                <li>🎨 Уникальный дизайн Nilan</li>
+                                <li>👕 Удобная посадка</li>
+                                <li>🧵 Прочная строчка</li>
+                                {% if average_rating > 0 %}
+                                <li>⭐ Средняя оценка: {{ average_rating|floatformat:1 }}/5</li>
+                                {% endif %}
+                            </ul>
+                        </div>
+
+                        <div class="product-actions-section">
+                            <div class="price-section">
+                                <span class="product-price">{{ product.price }} руб.</span>
+                            </div>
+
+                            <div class="action-buttons">
+                                <form method="post" action="{% url 'shop:add_to_cart' product.id %}" class="add-to-cart-form">
+                                    {% csrf_token %}
+                                    <button type="submit" class="add-to-cart-btn-detail">
+                                        <span class="btn-icon">🛒</span>
+                                        Добавить в корзину
+                                    </button>
+                                </form>
+
+                                <a href="{% url 'shop:product_list' %}" class="continue-shopping-btn">
+                                    <span class="btn-icon">←</span>
+                                    Вернуться в каталог
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="product-additional-info">
+                            <div class="info-item">
+                                <span class="info-icon">🚚</span>
+                                <span class="info-text">Бесплатная доставка от 3000 руб.</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-icon">↩️</span>
+                                <span class="info-text">Возврат в течение 14 дней</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-icon">🛡️</span>
+                                <span class="info-text">Гарантия качества</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Секция отзывов -->
+            <div class="reviews-section">
+                <div class="reviews-container">
+                    <h2>⭐ Отзывы покупателей</h2>
+
+                    <div class="reviews-stats">
+                        <div class="rating-overview">
+                            <div class="average-rating">
+                                <span class="rating-stars">
+                                    {% if average_rating > 0 %}
+                                        {% for i in "12345" %}
+                                            {% if forloop.counter <= average_rating %}
+                                                ⭐
+                                            {% else %}
+                                                ☆
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% else %}
+                                        <span style="color: #999; font-size: 1.5rem;">☆☆☆☆☆</span>
+                                    {% endif %}
+                                </span>
+                                {% if average_rating > 0 %}
+                                    <span class="rating-number">{{ average_rating|floatformat:1 }}</span>
+                                    <span class="rating-count">({{ reviews.count }} отзывов)</span>
+                                {% else %}
+                                    <span class="rating-number">0.0</span>
+                                    <span class="rating-count">(нет отзывов)</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        {% if user.is_authenticated %}
+                            {% if user_review %}
+                                <div class="review-actions-auth">
+                                    <a href="{% url 'shop:edit_review' user_review.id %}" class="review-btn">
+                                        ✏️ Редактировать мой отзыв
+                                    </a>
+                                </div>
+                            {% else %}
+                                <a href="{% url 'shop:add_review' product.id %}" class="review-btn">
+                                    ✍️ Написать отзыв
+                                </a>
+                            {% endif %}
+                        {% else %}
+                            <a href="{% url 'users:login' %}" class="review-btn">
+                                🔐 Войдите, чтобы оставить отзыв
+                            </a>
+                        {% endif %}
+                    </div>
+
+                    <!-- Реальные отзывы из базы данных -->
+                    <div class="reviews-list">
+                        {% for review in reviews %}
+                            <div class="review-card {% if review.user == user %}my-review{% endif %}">
+                                <div class="review-header">
+                                    <div class="reviewer-info">
+                                        <div class="reviewer-avatar">
+                                            {{ review.user.username|first|upper }}
+                                        </div>
+                                        <div class="reviewer-details">
+                                            <strong>{{ review.user.username }}</strong>
+                                            <span class="review-date">{{ review.created|date:"d.m.Y H:i" }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="review-rating">
+                                        <span class="stars">
+                                            {{ review.get_rating_stars }}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="review-content">
+                                    <p>{{ review.comment|default:"Без комментария" }}</p>
+                                </div>
+
+                                {% if review.user == user %}
+                                <div class="review-actions">
+                                    <a href="{% url 'shop:edit_review' review.id %}" class="edit-review">✏️ Редактировать</a>
+                                    <a href="{% url 'shop:delete_review' review.id %}" class="delete-review">🗑️ Удалить</a>
+                                </div>
+                                {% endif %}
+                            </div>
+                        {% empty %}
+                            <div class="no-reviews">
+                                <p>Пока нет отзывов на этот товар. Будьте первым! 🎯</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="social-links">
+                <h3>Мы в соцсетях</h3>
+                <div class="social-icons">
+                    <a href="#" class="social-link">Telegram</a>
+                    <a href="#" class="social-link">VK</a>
+                </div>
+            </div>
+
+            <div class="copyright">
+                <p>&copy; {% now "Y" %} Nilan Clothing. Все права защищены.</p>
+                <p>Сайт создан с ❤️ для фанатов стиля</p>
+            </div>
+        </div>
+    </footer>
+
+    <style>
+        .review-actions-auth {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .rating-stars {
+            font-size: 1.5rem;
+        }
+
+        .no-reviews {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 2px dashed #e9ecef;
+        }
+
+        /* Стили для блока количества товара */
+        .product-stock {
+            margin: 0.5rem 0;
+            font-weight: 500;
+            font-size: 1.1rem;
+        }
+        .product-stock .available {
+            color: #27ae60;
+        }
+        .product-stock .not-available {
+            color: #e74c3c;
+        }
+    </style>
+</body>
+</html>
