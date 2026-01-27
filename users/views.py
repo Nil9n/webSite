@@ -10,16 +10,53 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 
+def restore_account(request):
+    """Страница восстановления аккаунта (альтернативный способ)"""
+    if request.method == 'POST':
+        username = request.POST.get('username', '').strip()
+        email = request.POST.get('email', '').strip()
+
+        try:
+            # Используем _base_manager чтобы обойти фильтрацию менеджера
+            user = User._base_manager.get(
+                username=username,
+                email=email,
+                is_deleted=True
+            )
+
+            if user.is_restorable():
+                # Сохраняем в сессии для подтверждения
+                request.session['user_to_restore_id'] = user.id
+                return redirect('users:confirm_restore')
+            else:
+                messages.error(request, 'Срок восстановления аккаунта истек (30 дней).')
+                return redirect('home')
+
+        except User.DoesNotExist:
+            messages.error(request, 'Аккаунт с такими данными не найден или не был удален.')
+
+    return render(request, 'users/restore_account.html')
+
+
 def user_login(request):
     """Вход с восстановлением удаленных аккаунтов"""
     if request.method == 'POST':
-        form = AuthenticationForm(request, data=request.POST)
-        if form.is_valid():
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password')
-            user = authenticate(username=username, password=password)
+        # Используем стандартную форму для получения данных
+        username = request.POST.get('username', '').strip()
+        password = request.POST.get('password', '').strip()
 
-            if user is not None:
+        if not username or not password:
+            messages.error(request, 'Заполните все поля')
+            return render(request, 'users/login.html', {'form': AuthenticationForm()})
+
+        try:
+            # Ищем пользователя напрямую, обходя кастомный менеджер
+            user = User._base_manager.get(username=username)
+
+            # Проверяем пароль
+            if user.check_password(password):
+                # Пароль верный
+
                 # Проверяем, не удален ли аккаунт
                 if user.is_deleted:
                     if user.is_restorable():
@@ -30,11 +67,21 @@ def user_login(request):
                         messages.error(request, 'Срок восстановления аккаунта истек (30 дней).')
                         return redirect('home')
                 else:
-                    # Обычный вход
+                    # Обычный вход - указываем бэкенд
+                    user.backend = 'django.contrib.auth.backends.ModelBackend'
                     login(request, user)
+                    messages.success(request, f'Добро пожаловать, {user.username}!')
                     return redirect('home')
             else:
+                # Неверный пароль
                 messages.error(request, 'Неверное имя пользователя или пароль')
+
+        except User.DoesNotExist:
+            # Пользователь не найден
+            messages.error(request, 'Неверное имя пользователя или пароль')
+
+        # Если дошли сюда, показываем форму с ошибками
+        form = AuthenticationForm(request.POST)
     else:
         form = AuthenticationForm()
 
@@ -46,16 +93,22 @@ def confirm_restore(request):
     user_id = request.session.get('user_to_restore_id')
 
     if not user_id:
+        messages.error(request, 'Сессия восстановления не найдена')
         return redirect('users:login')
 
     try:
-        user = User.objects.get(id=user_id, is_deleted=True)
+        # Используем _base_manager для поиска удаленного пользователя
+        user = User._base_manager.get(id=user_id, is_deleted=True)
     except User.DoesNotExist:
+        messages.error(request, 'Пользователь для восстановления не найден')
         return redirect('users:login')
 
     if request.method == 'POST':
         # Восстанавливаем аккаунт
         user.restore()
+
+        # Указываем бэкенд для login()
+        user.backend = 'django.contrib.auth.backends.ModelBackend'
 
         # Логиним пользователя
         login(request, user)
@@ -75,7 +128,10 @@ def register(request):
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
+            # Указываем бэкенд для нового пользователя
+            user.backend = 'django.contrib.auth.backends.ModelBackend'
             login(request, user)
+            messages.success(request, 'Регистрация успешна! Добро пожаловать!')
             return redirect('home')
     else:
         form = CustomUserCreationForm()
@@ -84,6 +140,7 @@ def register(request):
 
 def user_logout(request):
     logout(request)
+    messages.success(request, 'Вы успешно вышли из системы')
     return redirect('home')
 
 

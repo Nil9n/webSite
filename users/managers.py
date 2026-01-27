@@ -42,3 +42,8 @@ class CustomUserManager(BaseUserManager):
         qs = self.only_deleted().filter(*args, **kwargs)
         for user in qs:
             user.restore()
+
+    # ДОБАВЬТЕ ЭТОТ МЕТОД для работы аутентификации
+    def get_by_natural_key(self, username):
+        """Для поиска при аутентификации - ищем даже удаленных"""
+        return self.all_with_deleted().get(username=username)
