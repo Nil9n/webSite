@@ -11,7 +11,6 @@ User = get_user_model()
 
 
 def restore_account(request):
-    """Страница восстановления аккаунта (альтернативный способ)"""
     if request.method == 'POST':
         username = request.POST.get('username', '').strip()
         email = request.POST.get('email', '').strip()

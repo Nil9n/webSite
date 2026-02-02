@@ -183,6 +183,7 @@
             <div class="copyright">
                 <p>&copy; {% now "Y" %} Nilan Clothing. Все права защищены.</p>
                 <p>Сайт создан с ❤️ для фанатов стиля</p>
+                <p><a href="#" id="openPolicy" style="color: #4ecdc4; text-decoration: underline; cursor: pointer;">Политика конфиденциальности</a></p>
             </div>
         </div>
     </footer>
@@ -399,5 +400,12 @@
             }
         });
     </script>
+<div id="policyModal" class="modal">
+    <div class="modal-content">
+        {% include 'privacy_policy.html' %}
+    </div>
+</div>
+
+<script src="{% static 'scripts.js' %}"></script>
 </body>
 </html>

@@ -17,10 +17,9 @@ class CustomUser(AbstractUser):
         verbose_name_plural = 'Пользователи'
 
     def soft_delete(self):
-        """Просто ставим флаги - НЕ меняем username/email"""
         self.is_deleted = True
         self.deleted_at = timezone.now()
-        self.is_active = False  # ⬅️ ВАЖНО: нельзя войти!
+        self.is_active = False
         self.save()
 
     def restore(self):
