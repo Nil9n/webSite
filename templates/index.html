@@ -29,137 +29,100 @@
 
     <main>
         <section class="hero">
-            <h2>Nilan Clothing</h2>
-            <p>Ваш Стиль. Ваши Правила.</p>
-        </section>
-
-        <section class="categories">
-            <h2>Наши товары</h2>
-            <div class="category-grid">
-                {% for category in categories %}
-                <div class="category-card">
-                    {% if category.image %}
-                        <img src="{{ category.image.url }}" alt="{{ category.name }}" class="category-image">
-                    {% else %}
-                        <div class="category-placeholder">{{ category.name }}</div>
-                    {% endif %}
-                    <h3>{{ category.name }}</h3>
-                    <a href="{% url 'shop:product_list' %}?category={{ category.slug }}" class="category-link">
-                        Смотреть товары
-                    </a>
-                </div>
-                {% endfor %}
+            <div class="main-wrapper">
+                <h2>Nilan Clothing</h2>
+                <p>Ваш Стиль. Ваши Правила.</p>
             </div>
         </section>
 
-        <section class="products">
-            <h2>Коллекция Nilan</h2>
-            
-            {% if products %}
-                <div class="products-grid">
-                    {% for product in products %}
-                    <div class="product-card">
-                        {% if product.image %}
-                            <img class="product-image" src="{{ product.image.url }}" alt="{{ product.name }}">
+        <section class="categories">
+            <div class="main-wrapper">
+                <h2>Наши товары</h2>
+                <div class="category-grid">
+                    {% for category in categories %}
+                    <div class="category-card">
+                        {% if category.image %}
+                            <img src="{{ category.image.url }}" alt="{{ category.name }}" class="category-image">
                         {% else %}
-                            <img class="product-image" src="{% static 't-shirt.png' %}" alt="{{ product.name }}">
+                            <div class="category-placeholder">{{ category.name }}</div>
                         {% endif %}
-                        <h3>{{ product.name }}</h3>
-                        <p>{{ product.description|truncatewords:10 }}</p>
-                        <p class="price">{{ product.price }} руб.</p>
-                        <form method="post" action="{% url 'shop:add_to_cart' product.id %}">
-                            {% csrf_token %}
-                            <button type="submit">В корзину</button>
-                        </form>
-                        <a href="{% url 'shop:product_detail' product.id %}" style="margin-top: 0.5rem; display: block;">
-                            <button style="background: #666;">Подробнее</button>
+                        <h3>{{ category.name }}</h3>
+                        <a href="{% url 'shop:product_list' %}?category={{ category.slug }}" class="category-link">
+                            Смотреть товары
                         </a>
                     </div>
                     {% endfor %}
                 </div>
-            {% else %}
-                <p>Первые товары появятся здесь скоро</p>
-                <div class="products-grid">
-                    <!-- Заглушки если товаров нет в базе -->
-                    <div class="product-card">
-                        <img class="product-image" src="{% static 't-shirt.png' %}" alt="Футболка Nilan"> 
-                        <h3>Футболки</h3>
-                        <p>Скоро в продаже</p>
-                        <p class="price">от 1500 руб.</p>
-                        <button>Узнать о запуске</button>
-                    </div>
+            </div>
+        </section>
 
-                    <div class="product-card">
-                        <img class="product-image" src="{% static 'sweater.png' %}" alt="Кофта Nilan"> 
-                        <h3>Кофты</h3>
-                        <p>Скоро в продаже</p>
-                        <p class="price">от 3500 руб.</p>
-                        <button>Узнать о запуске</button>
-                    </div>
+        <section class="products">
+            <div class="main-wrapper">
+                <h2>Коллекция Nilan</h2>
 
-                    <div class="product-card">
-                        <img class="product-image" src="{% static 'cap.png' %}" alt="Кепка Nilan"> 
-                        <h3>Кепки</h3>
-                        <p>Скоро в продаже</p>
-                        <p class="price">от 1200 руб.</p>
-                        <button>Узнать о запуске</button>
+                {% if products %}
+                    <div class="products-grid">
+                        {% for product in products %}
+                        <div class="product-card">
+                            {% if product.image %}
+                                <img class="product-image" src="{{ product.image.url }}" alt="{{ product.name }}">
+                            {% else %}
+                                <img class="product-image" src="{% static 't-shirt.png' %}" alt="{{ product.name }}">
+                            {% endif %}
+                            <h3>{{ product.name }}</h3>
+                            <p>{{ product.description|truncatewords:10 }}</p>
+                            <p class="price">{{ product.price }} руб.</p>
+                            <form method="post" action="{% url 'shop:add_to_cart' product.id %}">
+                                {% csrf_token %}
+                                <button type="submit">В корзину</button>
+                            </form>
+                            <a href="{% url 'shop:product_detail' product.id %}" style="margin-top: 0.5rem; display: block;">
+                                <button style="background: #666;">Подробнее</button>
+                            </a>
+                        </div>
+                        {% endfor %}
                     </div>
-
-                    <div class="product-card">
-                        <img class="product-image" src="{% static 'shorts.png' %}" alt="Шорты Nilan"> 
-                        <h3>Шорты</h3>
-                        <p>Скоро в продаже</p>
-                        <p class="price">от 2000 руб.</p>
-                        <button>Узнать о запуске</button>
-                    </div>
-
-                    <div class="product-card">
-                        <img class="product-image" src="{% static 'bracelet.png' %}" alt="Браслет Nilan"> 
-                        <h3>Браслеты</h3>
-                        <p>Скоро в продаже</p>
-                        <p class="price">от 500 руб.</p>
-                        <button>Узнать о запуске</button>
-                    </div>
-
-                    <div class="product-card">
-                        <img class="product-image" src="{% static 'ring.png' %}" alt="Кольцо Nilan"> 
-                        <h3>Кольца</h3>
-                        <p>Скоро в продаже</p>
-                        <p class="price">от 800 руб.</p>
-                        <button>Узнать о запуске</button>
-                    </div>
-                </div>
-            {% endif %}
+                {% else %}
+                    <p>Первые товары появятся здесь скоро</p>
+                    <div class="products-grid">
+                        <div class="product-card">
+                            <img class="product-image" src="{% static 't-shirt.png' %}" alt="Футболка Nilan">
+                            <h3>Футболки</h3>
+                            <p>Скоро в продаже</p>
+                            <p class="price">от 1500 руб.</p>
+                            <button>Узнать о запуске</button>
+                        </div>
+                        </div>
+                {% endif %}
+            </div>
         </section>
     </main>
 
     <footer class="site-footer">
-        <div class="footer-content">
-            <div class="social-links">
-                <h3>Мы в соцсетях</h3>
-                <div class="social-icons">
-                    <a href="#" class="social-link">Telegram</a>
-                    <a href="#" class="social-link">VK</a>
+        <div class="main-wrapper">
+            <div class="footer-content">
+                <div class="social-links">
+                    <h3>Мы в соцсетях</h3>
+                    <div class="social-icons">
+                        <a href="#" class="social-link">Telegram</a>
+                        <a href="#" class="social-link">VK</a>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="copyright">
-                <p>&copy; {% now "Y" %} Nilan Clothing. Все права защищены.</p>
-                <p>Сайт создан с ❤️ для фанатов стиля</p>
-                    <p><a href="#" id="openPolicy" style="color: #4ecdc4; text-decoration: underline;">Политика конфиденциальности</a></p>
+
+                <div class="copyright">
+                    <p>&copy; {% now "Y" %} Nilan Clothing. Все права защищены.</p>
+                    <p>Сайт создан с ❤️ для фанатов стиля</p>
+                    <p><a href="#" id="openPolicy" style="color: #4ecdc4; text-decoration: underline; cursor: pointer;">Политика конфиденциальности</a></p>            </div>
+                </div>
             </div>
         </div>
     </footer>
 <div id="policyModal" class="modal">
     <div class="modal-content">
-        <span class="close-modal">&times;</span>
-        <h2>Политика конфиденциальности</h2>
-        <div class="policy-text">
-            <p>Nilan Clothing уважает вашу конфиденциальность...</p>
-            <p>Мы используем данные только для работы корзины и личного кабинета.</p>
-        </div>
+        {% include 'privacy_policy.html' %}
     </div>
 </div>
+
 <script src="{% static 'scripts.js' %}"></script>
 </body>
 </html>

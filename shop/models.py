@@ -13,7 +13,7 @@ class Category(models.Model):
 
 
 class Product(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=201)
     slug = models.SlugField(unique=True)
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
@@ -56,6 +56,7 @@ class Product(models.Model):
         if not self.available:
             self.available = True
         self.save()
+
 
 class Cart(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -135,7 +136,23 @@ class Order(models.Model):
         return f'Order {self.id} - {self.user.username}'
 
     def get_status_display_with_icon(self):
+        """Возвращает статус заказа с иконкой"""
+        # Используем словарь из STATUS_CHOICES
         return dict(self.STATUS_CHOICES).get(self.status, self.status)
+
+    # ДОБАВЛЕН ЭТОТ МЕТОД:
+    @property
+    def get_status_display_with_icon_property(self):
+        """Свойство для удобного доступа к статусу с иконкой"""
+        icons = {
+            'pending': '⏳',
+            'processing': '🔄',
+            'shipped': '🚚',
+            'delivered': '✅',
+            'cancelled': '❌'
+        }
+        icon = icons.get(self.status, '📋')
+        return f"{icon} {self.get_status_display()}"
 
     def get_payment_method_display_with_icon(self):
         return dict(self.PAYMENT_CHOICES).get(self.payment_method, self.payment_method)
@@ -224,3 +241,11 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return f'Profile {self.user.username}'
+
+
+class Location(models.Model):
+    name = models.CharField(max_length=100)
+    is_country = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.name

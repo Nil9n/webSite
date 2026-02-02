@@ -242,6 +242,25 @@
                 justify-content: center;
             }
         }
+
+        /* Стили для сообщений об успехе */
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
 <body>
@@ -280,6 +299,9 @@
 
             <form method="post" class="auth-form" id="editReviewForm">
                 {% csrf_token %}
+
+                <!-- Скрытое поле для хранения статуса успешной отправки -->
+                <input type="hidden" name="success" id="formSuccess" value="{% if form_success %}true{% endif %}">
 
                 <div class="form-group rating-group" id="ratingGroup">
                     <label>
@@ -333,7 +355,8 @@
                 </div>
 
                 <div class="form-actions">
-                    <a href="{% url 'shop:product_detail' product.id %}" class="back-btn">
+                    <!-- Добавляем якорь #reviews в ссылку "Назад к товару" -->
+                    <a href="{% url 'shop:product_detail' product.id %}#reviews" class="back-btn">
                         <span class="btn-icon">←</span>
                         Назад к товару
                     </a>
@@ -359,6 +382,7 @@
             <div class="copyright">
                 <p>&copy; {% now "Y" %} Nilan Clothing. Все права защищены.</p>
                 <p>Сайт создан с ❤️ для фанатов стиля</p>
+                <p><a href="#" id="openPolicy" style="color: #4ecdc4; text-decoration: underline; cursor: pointer;">Политика конфиденциальности</a></p>
             </div>
         </div>
     </footer>
@@ -549,7 +573,57 @@
                     }
                 });
             });
+
+            // ДОБАВЛЯЕМ НОВЫЙ КОД ДЛЯ ПРОКРУТКИ ПОСЛЕ УСПЕШНОЙ ОТПРАВКИ
+
+            // Проверяем, была ли форма успешно отправлена (через Django messages)
+            const messages = document.querySelector('.messages');
+            if (messages) {
+                // Ищем сообщение об успехе
+                const successMessage = messages.querySelector('.message.success, .message.info');
+                if (successMessage) {
+                    // Ждем немного, чтобы сообщение отобразилось
+                    setTimeout(() => {
+                        // Прокручиваем к сообщению об успехе
+                        successMessage.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
+
+                        // Показываем текст о автоматическом перенаправлении
+                        const redirectText = document.createElement('div');
+                        redirectText.className = 'message info';
+                        redirectText.innerHTML = 'Через 3 секунды вы будете автоматически перенаправлены к отзывам...';
+                        successMessage.parentNode.insertBefore(redirectText, successMessage.nextSibling);
+
+                        // Через 3 секунды переходим на страницу товара с якорем #reviews
+                        setTimeout(() => {
+                            window.location.href = "{% url 'shop:product_detail' product.id %}#reviews";
+                        }, 3000);
+                    }, 500);
+                }
+            }
+
+            // Альтернативный вариант: если форма отправлена и есть параметр success
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('success')) {
+                // Прокручиваем к верху формы и показываем сообщение
+                const form = document.getElementById('editReviewForm');
+                if (form) {
+                    form.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            }
         });
     </script>
+<div id="policyModal" class="modal">
+    <div class="modal-content">
+        {% include 'privacy_policy.html' %}
+    </div>
+</div>
+
+<script src="{% static 'scripts.js' %}"></script>
 </body>
 </html>

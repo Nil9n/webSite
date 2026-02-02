@@ -10,6 +10,7 @@ urlpatterns = [
     path('cart/add/<int:product_id>/', views.add_to_cart, name='add_to_cart'),
     path('cart/remove/<int:item_id>/', views.remove_from_cart, name='remove_from_cart'),
     path('cart/update/<int:item_id>/', views.update_cart_item, name='update_cart_item'),
+    path('api/locations/', views.api_locations, name='api_locations'),
 
     # URL для заказов
     path('order/create/', views.order_create, name='order_create'),

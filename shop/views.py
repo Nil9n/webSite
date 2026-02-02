@@ -1,8 +1,11 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.urls import reverse
 from .models import Product, Category, Cart, CartItem, Order, OrderItem, Review
 from .forms import OrderCreateForm, ReviewForm
+from django.http import JsonResponse
+from .models import Location
 
 
 def home(request):
@@ -220,9 +223,32 @@ def order_detail(request, order_id):
 
 @login_required
 def order_history(request):
-    """История заказов пользователя"""
+    """История заказов пользователя с фильтрами"""
     orders = Order.objects.filter(user=request.user).order_by('-created')
-    return render(request, 'shop/order_history.html', {'orders': orders})
+
+    # Получаем статус из GET параметра
+    status_filter = request.GET.get('status')
+    if status_filter:
+        orders = orders.filter(status=status_filter)
+
+    # Получаем все статусы заказов
+    status_choices = Order.STATUS_CHOICES
+
+    # Считаем количество заказов по статусам
+    orders_by_status = {}
+    all_orders = Order.objects.filter(user=request.user)
+    all_orders_count = all_orders.count()
+
+    for status_code, status_name in status_choices:
+        orders_by_status[status_code] = all_orders.filter(status=status_code).count()
+
+    return render(request, 'shop/order_history.html', {
+        'orders': orders,
+        'status_filter': status_filter,
+        'status_choices': status_choices,
+        'all_orders_count': all_orders_count,
+        'orders_by_status': orders_by_status
+    })
 
 
 # Функции для отзывов
@@ -235,7 +261,7 @@ def add_review(request, product_id):
 
     if existing_review:
         messages.info(request, 'Вы уже оставляли отзыв на этот товар')
-        return redirect('shop:product_detail', id=product_id)
+        return redirect(f'{reverse("shop:product_detail", args=[product_id])}#reviews')
 
     if request.method == 'POST':
         form = ReviewForm(request.POST)
@@ -246,7 +272,8 @@ def add_review(request, product_id):
             review.approved = True  # Автоматически одобряем
             review.save()
             messages.success(request, 'Спасибо за ваш отзыв! ✨')
-            return redirect('shop:product_detail', id=product_id)
+            # ДОБАВЛЯЕМ ЯКОРЬ #reviews
+            return redirect(f'{reverse("shop:product_detail", args=[product_id])}#reviews')
         else:
             messages.error(request, 'Пожалуйста, выберите оценку от 1 до 5 звезд')
     else:
@@ -267,7 +294,8 @@ def edit_review(request, review_id):
         if form.is_valid():
             form.save()
             messages.success(request, 'Отзыв успешно обновлен! ✨')
-            return redirect('shop:product_detail', id=review.product.id)
+            # ДОБАВЛЯЕМ ЯКОРЬ #reviews
+            return redirect(f'{reverse("shop:product_detail", args=[review.product.id])}#reviews')
     else:
         form = ReviewForm(instance=review)
 
@@ -286,8 +314,24 @@ def delete_review(request, review_id):
     if request.method == 'POST':
         review.delete()
         messages.success(request, 'Отзыв удален')
-        return redirect('shop:product_detail', id=product_id)
+        # ДОБАВЛЯЕМ ЯКОРЬ #reviews
+        return redirect(f'{reverse("shop:product_detail", args=[product_id])}#reviews')
 
     return render(request, 'shop/delete_review.html', {
         'review': review
     })
+
+
+def api_locations(request):
+    term = request.GET.get('term', '').strip()
+    is_country = request.GET.get('type') == 'country'
+    # Используем istartswith для игнорирования регистра
+    locations = Location.objects.filter(
+        name__istartswith=term,  #
+        is_country=is_country
+    ).order_by('name')[:10]
+    return JsonResponse([loc.name for loc in locations], safe=False)
+
+
+def privacy_policy(request):
+    return render(request, 'privacy_policy.html')

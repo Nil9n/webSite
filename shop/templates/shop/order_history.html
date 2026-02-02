@@ -6,6 +6,339 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>История заказов - Nilan Clothing</title>
     <link rel="stylesheet" href="{% static 'style.css' %}">
+    <style>
+        /* Стили для фильтров */
+        .order-filters {
+            margin: 1.5rem 0;
+            padding: 1.2rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
+        }
+
+        .filter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .filter-header h2 {
+            margin: 0;
+            font-size: 1.2rem;
+            color: #2c3e50;
+        }
+
+        .reset-filters {
+            background: none;
+            border: none;
+            color: #4ecdc4;
+            cursor: pointer;
+            font-size: 0.9rem;
+            text-decoration: underline;
+            padding: 0;
+            white-space: nowrap;
+        }
+
+        .reset-filters:hover {
+            color: #3bb4ac;
+        }
+
+        .filter-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            border: 2px solid #e9ecef;
+            border-radius: 20px;
+            background: white;
+            color: #6c757d;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+
+        .filter-btn:hover {
+            border-color: #4ecdc4;
+            color: #4ecdc4;
+            transform: translateY(-2px);
+        }
+
+        .filter-btn.active {
+            background: #4ecdc4;
+            color: white;
+            border-color: #4ecdc4;
+        }
+
+        /* Стили для счетчика заказов */
+        .orders-count {
+            display: inline-block;
+            background: #4ecdc4;
+            color: white;
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            margin-left: 0.5rem;
+        }
+
+        /* Стили для пустого состояния после фильтрации */
+        .no-filter-results {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+
+        .no-filter-results .empty-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .no-filter-results p {
+            margin: 0.5rem 0;
+        }
+
+        /* Стили для карточек заказов на мобильных */
+        .order-card {
+            transition: all 0.3s;
+        }
+
+        .order-header {
+            flex-wrap: wrap;
+        }
+
+        .order-info h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .order-date {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .order-items-preview {
+            flex-wrap: wrap;
+        }
+
+        .preview-item {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .preview-item img {
+            width: 50px;
+            height: 50px;
+            margin-bottom: 0.3rem;
+        }
+
+        .preview-item span {
+            font-size: 0.8rem;
+            max-width: 80px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .order-summary {
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .order-total {
+            font-size: 1.1rem;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .order-history-container {
+                padding: 0.5rem;
+            }
+
+            .order-history-container h1 {
+                font-size: 1.5rem;
+                text-align: center;
+                margin-bottom: 1rem;
+            }
+
+            .filter-header {
+                flex-direction: column;
+                gap: 0.8rem;
+                align-items: stretch;
+                text-align: center;
+            }
+
+            .filter-header h2 {
+                font-size: 1.1rem;
+            }
+
+            .filter-options {
+                justify-content: center;
+                gap: 0.3rem;
+            }
+
+            .filter-btn {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.8rem;
+                flex: 1;
+                min-width: calc(50% - 0.3rem);
+                max-width: calc(50% - 0.3rem);
+                text-align: center;
+            }
+
+            .orders-count {
+                margin-left: 0.3rem;
+                padding: 0.1rem 0.4rem;
+                font-size: 0.7rem;
+            }
+
+            .reset-filters {
+                align-self: center;
+                font-size: 0.9rem;
+            }
+
+            .order-card {
+                padding: 1rem;
+                margin-bottom: 1rem;
+            }
+
+            .order-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+                margin-bottom: 1rem;
+            }
+
+            .order-status {
+                align-self: flex-start;
+            }
+
+            .order-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .order-items-preview {
+                justify-content: flex-start;
+                gap: 0.5rem;
+            }
+
+            .preview-item {
+                flex: 0 0 auto;
+            }
+
+            .more-items {
+                font-size: 0.8rem;
+                padding: 0.3rem 0.6rem;
+            }
+
+            .order-summary {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 1rem;
+            }
+
+            .order-actions {
+                width: 100%;
+            }
+
+            .view-details-btn {
+                display: block;
+                text-align: center;
+                padding: 0.7rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .filter-btn {
+                min-width: 100%;
+                max-width: 100%;
+            }
+
+            .order-filters {
+                padding: 1rem;
+                margin: 1rem 0;
+            }
+
+            .order-info h3 {
+                font-size: 1rem;
+            }
+
+            .preview-item img {
+                width: 40px;
+                height: 40px;
+            }
+
+            .preview-item span {
+                font-size: 0.7rem;
+                max-width: 60px;
+            }
+
+            .no-filter-results,
+            .no-orders {
+                padding: 1.5rem;
+            }
+
+            .no-filter-results .empty-icon,
+            .no-orders .empty-icon {
+                font-size: 2rem;
+            }
+
+            .no-filter-results h3,
+            .no-orders h3 {
+                font-size: 1.1rem;
+            }
+
+            .empty-action {
+                display: block;
+                text-align: center;
+                padding: 0.8rem;
+                margin-top: 1rem;
+            }
+        }
+
+        /* Для очень маленьких экранов */
+        @media (max-width: 360px) {
+            .filter-btn {
+                font-size: 0.75rem;
+                padding: 0.3rem 0.6rem;
+            }
+
+            .order-card {
+                padding: 0.8rem;
+            }
+
+            .order-total {
+                font-size: 1rem;
+            }
+
+            .view-details-btn {
+                padding: 0.6rem;
+                font-size: 0.85rem;
+            }
+        }
+
+        /* Улучшение навигации на мобильных */
+        @media (max-width: 768px) {
+            nav {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 0.5rem;
+                padding: 0.5rem;
+            }
+
+            nav a {
+                font-size: 0.9rem;
+                padding: 0.3rem 0.6rem;
+            }
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -31,6 +364,32 @@
             <div class="order-history-container">
                 <h1>История заказов</h1>
 
+                <!-- Фильтры по статусам -->
+                <div class="order-filters">
+                    <div class="filter-header">
+                        <h2>Фильтр по статусу:</h2>
+                        <button class="reset-filters" id="resetFilters">Сбросить фильтры</button>
+                    </div>
+
+                    <div class="filter-options">
+                        <button class="filter-btn {% if not status_filter %}active{% endif %}" data-status="all">
+                            Все заказы <span class="orders-count">{{ all_orders_count }}</span>
+                        </button>
+
+                        {% for status_code, status_name in status_choices %}
+                        <button class="filter-btn {% if status_filter == status_code %}active{% endif %}"
+                                data-status="{{ status_code }}">
+                            {{ status_name }}
+                            <span class="orders-count">
+                                {% for key, value in orders_by_status.items %}
+                                    {% if key == status_code %}{{ value }}{% endif %}
+                                {% endfor %}
+                            </span>
+                        </button>
+                        {% endfor %}
+                    </div>
+                </div>
+
                 {% if orders %}
                     <div class="orders-list">
                         {% for order in orders %}
@@ -41,7 +400,7 @@
                                     <p class="order-date">{{ order.created|date:"d.m.Y H:i" }}</p>
                                 </div>
                                 <div class="order-status">
-                                    <span class="status-badge {{ order.status }}">{{ order.get_status_display_with_icon }}</span>
+                                    <span class="status-badge {{ order.status }}">{{ order.get_status_display_with_icon_property }}</span>
                                 </div>
                             </div>
 
@@ -75,6 +434,14 @@
                         {% endfor %}
                     </div>
                 {% else %}
+                    {% if status_filter %}
+                    <div class="no-filter-results">
+                        <div class="empty-icon">🔍</div>
+                        <h3>Заказов с выбранным статусом не найдено</h3>
+                        <p>Попробуйте выбрать другой статус или сбросить фильтры</p>
+                        <button class="reset-filters" style="margin-top: 1rem;">Сбросить фильтры</button>
+                    </div>
+                    {% else %}
                     <div class="no-orders">
                         <div class="empty-state">
                             <div class="empty-icon">📦</div>
@@ -83,6 +450,7 @@
                             <a href="{% url 'shop:product_list' %}" class="empty-action">Начать покупки</a>
                         </div>
                     </div>
+                    {% endif %}
                 {% endif %}
             </div>
         </section>
@@ -101,8 +469,77 @@
             <div class="copyright">
                 <p>&copy; {% now "Y" %} Nilan Clothing. Все права защищены.</p>
                 <p>Сайт создан с ❤️ для фанатов стиля</p>
+                <p><a href="#" id="openPolicy" style="color: #4ecdc4; text-decoration: underline; cursor: pointer;">Политика конфиденциальности</a></p>
             </div>
         </div>
     </footer>
+
+    <div id="policyModal" class="modal">
+        <div class="modal-content">
+            {% include 'privacy_policy.html' %}
+        </div>
+    </div>
+
+    <script src="{% static 'scripts.js' %}"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Фильтрация заказов
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            const resetBtn = document.getElementById('resetFilters');
+
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const status = this.getAttribute('data-status');
+
+                    // Удаляем активный класс у всех кнопок
+                    filterBtns.forEach(b => b.classList.remove('active'));
+
+                    // Добавляем активный класс текущей кнопке
+                    this.classList.add('active');
+
+                    // Если выбрано не "все", добавляем параметр в URL
+                    if (status === 'all') {
+                        window.location.href = "{% url 'shop:order_history' %}";
+                    } else {
+                        window.location.href = "{% url 'shop:order_history' %}?status=" + status;
+                    }
+                });
+            });
+
+            // Сброс фильтров
+            if (resetBtn) {
+                resetBtn.addEventListener('click', function() {
+                    window.location.href = "{% url 'shop:order_history' %}";
+                });
+            }
+
+            // Адаптивное поведение для мобильных устройств
+            function adjustForMobile() {
+                const isMobile = window.innerWidth <= 768;
+                const orderCards = document.querySelectorAll('.order-card');
+
+                if (isMobile) {
+                    orderCards.forEach(card => {
+                        card.style.cursor = 'pointer';
+                        card.addEventListener('click', function(e) {
+                            // Не открывать при клике на кнопки или ссылки внутри карточки
+                            if (!e.target.closest('.view-details-btn') &&
+                                !e.target.closest('.filter-btn') &&
+                                !e.target.closest('.reset-filters')) {
+                                const orderId = this.querySelector('h3').textContent.match(/#(\d+)/)[1];
+                                if (orderId) {
+                                    window.location.href = "{% url 'shop:order_detail' 0 %}".replace('0', orderId);
+                                }
+                            }
+                        });
+                    });
+                }
+            }
+
+            adjustForMobile();
+            window.addEventListener('resize', adjustForMobile);
+        });
+    </script>
 </body>
 </html>

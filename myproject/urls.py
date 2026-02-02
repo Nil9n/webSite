@@ -3,13 +3,15 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from shop import views
-from django.contrib.auth import views as auth_views  # ДОБАВЬ ЭТУ СТРОКУ
+from django.contrib.auth import views as auth_views
+from django.views.generic import TemplateView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),
     path('shop/', include('shop.urls')),
     path('users/', include('users.urls')),
+    path('privacy-policy/', TemplateView.as_view(template_name='privacy_policy.html'), name='privacy_policy'),
 
     # URL для восстановления пароля
     path('password-reset/',

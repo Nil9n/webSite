@@ -32,7 +32,7 @@
                 <div class="order-header">
                     <h1>Заказ #{{ order.id }}</h1>
                     <div class="order-status">
-                        <span class="status-badge {{ order.status }}">{{ order.get_status_display_with_icon }}</span>
+                        <span class="status-badge {{ order.status }}">{{ order.get_status_display_with_icon_property }}</span>
                     </div>
                 </div>
 
@@ -70,7 +70,7 @@
                         <div class="order-details">
                             <div class="detail-item">
                                 <strong>Статус:</strong>
-                                <span class="status-badge {{ order.status }}">{{ order.get_status_display_with_icon }}</span>
+                                <span class="status-badge {{ order.status }}">{{ order.get_status_display_with_icon_property }}</span>
                             </div>
                             <div class="detail-item">
                                 <strong>Дата заказа:</strong>
@@ -158,8 +158,16 @@
             <div class="copyright">
                 <p>&copy; {% now "Y" %} Nilan Clothing. Все права защищены.</p>
                 <p>Сайт создан с ❤️ для фанатов стиля</p>
+                <p><a href="#" id="openPolicy" style="color: #4ecdc4; text-decoration: underline; cursor: pointer;">Политика конфиденциальности</a></p>
             </div>
         </div>
     </footer>
+<div id="policyModal" class="modal">
+    <div class="modal-content">
+        {% include 'privacy_policy.html' %}
+    </div>
+</div>
+
+<script src="{% static 'scripts.js' %}"></script>
 </body>
 </html>

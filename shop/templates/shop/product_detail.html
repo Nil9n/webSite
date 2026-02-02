@@ -148,8 +148,8 @@
                 </div>
             </div>
 
-            <!-- Секция отзывов -->
-            <div class="reviews-section">
+            <!-- Секция отзывов - ДОБАВЛЕН id="reviews" -->
+            <div class="reviews-section" id="reviews">
                 <div class="reviews-container">
                     <h2>⭐ Отзывы покупателей</h2>
 
@@ -254,6 +254,7 @@
             <div class="copyright">
                 <p>&copy; {% now "Y" %} Nilan Clothing. Все права защищены.</p>
                 <p>Сайт создан с ❤️ для фанатов стиля</p>
+                <p><a href="#" id="openPolicy" style="color: #4ecdc4; text-decoration: underline; cursor: pointer;">Политика конфиденциальности</a></p>
             </div>
         </div>
     </footer>
@@ -289,6 +290,63 @@
         .product-stock .not-available {
             color: #e74c3c;
         }
+
+        /* Стиль для выделения секции отзывов при переходе по якорю */
+        .reviews-section:target {
+            animation: highlightReviews 2s ease;
+        }
+
+        @keyframes highlightReviews {
+            0% {
+                background-color: transparent;
+            }
+            50% {
+                background-color: rgba(78, 205, 196, 0.1);
+            }
+            100% {
+                background-color: transparent;
+            }
+        }
     </style>
+
+    <script>
+        // Прокрутка к отзывам при загрузке страницы с якорем #reviews
+        document.addEventListener('DOMContentLoaded', function() {
+            // Проверяем, есть ли якорь #reviews в URL
+            if (window.location.hash === '#reviews') {
+                // Ждем немного, чтобы страница полностью загрузилась
+                setTimeout(function() {
+                    const reviewsSection = document.getElementById('reviews');
+                    if (reviewsSection) {
+                        reviewsSection.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                }, 300);
+            }
+
+            // Обработка сообщений после отправки отзыва
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('review_success')) {
+                const reviewsSection = document.getElementById('reviews');
+                if (reviewsSection) {
+                    setTimeout(function() {
+                        reviewsSection.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }, 500);
+                }
+            }
+        });
+    </script>
+<div id="policyModal" class="modal">
+    <div class="modal-content">
+        {% include 'privacy_policy.html' %}
+    </div>
+</div>
+
+<script src="{% static 'scripts.js' %}"></script>
 </body>
 </html>

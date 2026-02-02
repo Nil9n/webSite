@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import Category, Product, Order, OrderItem, Review
-
+from .models import Location
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
@@ -68,3 +68,9 @@ class ReviewAdmin(admin.ModelAdmin):
     list_filter = ['rating', 'approved', 'created']
     list_editable = ['approved']
     search_fields = ['product__name', 'user__username', 'comment']
+
+@admin.register(Location)
+class LocationAdmin(admin.ModelAdmin):
+    list_display = ('name', 'is_country')
+    list_filter = ('is_country',)
+    search_fields = ('name',)
